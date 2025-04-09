@@ -49,12 +49,11 @@ const LoginPage = () => {
       <h1 className="text-center mb-4">Войти</h1>
       <Form onSubmit={formik.handleSubmit}>
         <Form.Group className="mb-3" controlId="username">
-          <Form.Label>Имя пользователя</Form.Label>
           <Form.Control
             id="username"
             type="text"
             name="username"
-            placeholder="Ваше имя пользователя"
+            placeholder="Ник"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.username}
@@ -66,7 +65,6 @@ const LoginPage = () => {
         </Form.Group>
 
         <Form.Group className="mb-3" controlId="password">
-          <Form.Label>Пароль</Form.Label>
           <Form.Control
             id="password"
             type="password"

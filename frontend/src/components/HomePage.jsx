@@ -11,7 +11,7 @@ const HomePage = () => {
     }
   }, [localToken, navigate])
 
-  return <h1>Home</h1>
+  return <h1>Welcome to Home Page</h1>
 }
 
 export default HomePage
