@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import axios from 'axios'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
 import { Form, Button, Container, Alert } from 'react-bootstrap'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { actions as authActions } from '../slices/authSlice.js'
+import { userLogIn } from '../slices/authSlice.js' // Обновленный импорт
 
 const validationSchema = yup.object({
   username: yup
@@ -20,7 +20,6 @@ const validationSchema = yup.object({
 
 const LoginPage = () => {
   const [error, setError] = useState(null)
-  const [isLoading, setIsLoading] = useState(false) // Добавляем состояние загрузки
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -32,17 +31,14 @@ const LoginPage = () => {
     validationSchema,
     onSubmit: async (values) => {
       setError(null)
-      setIsLoading(true) // Начинаем загрузку
       try {
         const response = await axios.post('/api/v1/login', values)
         const token = response.data.token
         const username = response.data.username
-        dispatch(authActions.userLogIn({ username, token }))
-        navigate('/', { replace: true }) // Переходим на главную страницу
+        dispatch(userLogIn({ username, token })) // Обновленное использование
+        navigate('/')
       } catch {
         setError('Неверные имя пользователя или пароль')
-      } finally {
-        setIsLoading(false) // Завершаем загрузку
       }
     },
   })
@@ -52,11 +48,12 @@ const LoginPage = () => {
       <h1 className="text-center mb-4">Войти</h1>
       <Form onSubmit={formik.handleSubmit}>
         <Form.Group className="mb-3" controlId="username">
+          <Form.Label>Имя пользователя</Form.Label>
           <Form.Control
             id="username"
             type="text"
             name="username"
-            placeholder="Ник"
+            placeholder="Ваше имя пользователя"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.username}
@@ -66,8 +63,8 @@ const LoginPage = () => {
             {formik.errors.username}
           </Form.Control.Feedback>
         </Form.Group>
-
         <Form.Group className="mb-3" controlId="password">
+          <Form.Label>Пароль</Form.Label>
           <Form.Control
             id="password"
             type="password"
@@ -87,14 +84,8 @@ const LoginPage = () => {
             {error}
           </Alert>
         )}
-        <Button
-          className="w-100"
-          variant="primary"
-          type="submit"
-          disabled={isLoading} // Отключаем кнопку во время загрузки
-        >
-          {isLoading ? 'Авторизация...' : 'Войти'}{' '}
-          {/* Показываем текст загрузки */}
+        <Button className="w-100" variant="primary" type="submit">
+          Войти
         </Button>
       </Form>
     </Container>
