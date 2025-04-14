@@ -4,9 +4,7 @@ import { useFormik } from 'formik'
 
 const MessageForm = () => {
   const formik = useFormik({
-    initialValues: {
-      message: '',
-    },
+    initialValues: { message: '' },
   })
 
   return (

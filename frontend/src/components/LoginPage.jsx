@@ -5,17 +5,17 @@ import * as yup from 'yup'
 import { Form, Button, Container, Alert } from 'react-bootstrap'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { userLogIn } from '../slices/authSlice.js' // Обновленный импорт
+import { userLogIn } from '../slices/authSlice.js'
 
 const validationSchema = yup.object({
   username: yup
     .string()
     .required('Не должно быть пустым')
-    .min(3, 'Имя пользователя должно быть не менее 3 символов'),
+    .min(3, 'Минимум 3 символа'),
   password: yup
     .string()
     .required('Не должно быть пустым')
-    .min(3, 'Пароль должен быть не менее 3 символов'),
+    .min(3, 'Минимум 3 символа'),
 })
 
 const LoginPage = () => {
@@ -24,10 +24,7 @@ const LoginPage = () => {
   const navigate = useNavigate()
 
   const formik = useFormik({
-    initialValues: {
-      username: '',
-      password: '',
-    },
+    initialValues: { username: '', password: '' },
     validationSchema,
     onSubmit: async (values) => {
       setError(null)
@@ -35,7 +32,7 @@ const LoginPage = () => {
         const response = await axios.post('/api/v1/login', values)
         const token = response.data.token
         const username = response.data.username
-        dispatch(userLogIn({ username, token })) // Обновленное использование
+        dispatch(userLogIn({ username, token }))
         navigate('/')
       } catch {
         setError('Неверные имя пользователя или пароль')
@@ -53,7 +50,7 @@ const LoginPage = () => {
             id="username"
             type="text"
             name="username"
-            placeholder="Ваше имя пользователя"
+            placeholder="Ник"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.username}

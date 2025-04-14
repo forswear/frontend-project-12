@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
-import { addChannels } from '../slices/channelsSlice.js'
-import { userLogOut } from '../slices/authSlice.js'
-import ChannelList from './channelList.jsx'
+import { addChannels } from '../slices/channelsSlice.js' // Исправленный импорт
+import { userLogOut } from '../slices/authSlice.js' // Исправленный импорт
+import ChannelsList from './ChannelsList.jsx' // Исправленный путь
 import ChatWindow from './ChatWindow.jsx'
 
 const getChannels = async (userToken) => {
@@ -36,7 +36,7 @@ const HomePage = () => {
       const fetchChannels = async () => {
         try {
           const channels = await getChannels(localToken)
-          dispatch(addChannels(channels))
+          dispatch(addChannels(channels)) // Использование действия addChannels
           setActiveChannel(channels[0])
         } catch (error) {
           console.log(error)
@@ -66,7 +66,7 @@ const HomePage = () => {
           className="bg-light p-3 border-end flex-shrink-0"
           style={{ width: '250px' }}
         >
-          <ChannelList
+          <ChannelsList
             channels={channels}
             activeChannel={activeChannel}
             onChannelClick={setActiveChannel}

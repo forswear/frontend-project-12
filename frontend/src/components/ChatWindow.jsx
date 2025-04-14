@@ -9,9 +9,11 @@ const ChatWindow = ({ activeChannel }) => {
         <h5 className="mb-0">{activeChannel?.name}</h5>
       </div>
       <Card className="flex-grow-1 rounded-0 border-0">
-        <Card.Body className="d-flex flex-column overflow-auto">{}</Card.Body>
+        <Card.Body className="d-flex flex-column overflow-auto">
+          {/* Сообщения чата */}
+        </Card.Body>
       </Card>
-      {}
+      {/* Форма ввода нового сообщения */}
       <MessageForm />
     </>
   )
