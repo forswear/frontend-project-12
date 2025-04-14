@@ -5,7 +5,6 @@ import * as yup from 'yup'
 import { Form, Button, Container, Alert } from 'react-bootstrap'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-
 import { actions as authActions } from '../slices/authSlice.js'
 
 const validationSchema = yup.object({
@@ -21,6 +20,7 @@ const validationSchema = yup.object({
 
 const LoginPage = () => {
   const [error, setError] = useState(null)
+  const [isLoading, setIsLoading] = useState(false) // Добавляем состояние загрузки
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -32,14 +32,17 @@ const LoginPage = () => {
     validationSchema,
     onSubmit: async (values) => {
       setError(null)
+      setIsLoading(true) // Начинаем загрузку
       try {
         const response = await axios.post('/api/v1/login', values)
         const token = response.data.token
         const username = response.data.username
         dispatch(authActions.userLogIn({ username, token }))
-        navigate('/')
+        navigate('/', { replace: true }) // Переходим на главную страницу
       } catch {
         setError('Неверные имя пользователя или пароль')
+      } finally {
+        setIsLoading(false) // Завершаем загрузку
       }
     },
   })
@@ -84,8 +87,14 @@ const LoginPage = () => {
             {error}
           </Alert>
         )}
-        <Button className="w-100" variant="primary" type="submit">
-          Войти
+        <Button
+          className="w-100"
+          variant="primary"
+          type="submit"
+          disabled={isLoading} // Отключаем кнопку во время загрузки
+        >
+          {isLoading ? 'Авторизация...' : 'Войти'}{' '}
+          {/* Показываем текст загрузки */}
         </Button>
       </Form>
     </Container>
