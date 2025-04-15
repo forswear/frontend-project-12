@@ -1,23 +1,22 @@
-import React, { useEffect, useState } from 'react'
+import { Container, Row, Col } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { addChannels } from '../slices/channelsSlice.js' // Исправленный импорт
-import { userLogOut } from '../slices/authSlice.js' // Исправленный импорт
-import ChannelsList from './ChannelsList.jsx' // Исправленный путь
+import axios from 'axios'
+import { addNewChannel, addChannels } from '../slices/channelsSlice.js'
+import Header from './Header.jsx'
+import ChannelsList from './ChannelsList.jsx'
 import ChatWindow from './ChatWindow.jsx'
+import socket from '../socket.js'
 
 const getChannels = async (userToken) => {
   try {
     const response = await axios.get('/api/v1/channels', {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
+      headers: { Authorization: `Bearer ${userToken}` },
     })
-    const channels = response.data
-    return channels
+    return response.data
   } catch (err) {
-    console.log(err)
+    console.error(err)
     throw err
   }
 }
@@ -36,53 +35,44 @@ const HomePage = () => {
       const fetchChannels = async () => {
         try {
           const channels = await getChannels(localToken)
-          dispatch(addChannels(channels)) // Использование действия addChannels
+          dispatch(addChannels(channels))
           setActiveChannel(channels[0])
         } catch (error) {
-          console.log(error)
+          console.error(error)
         }
       }
       fetchChannels()
     }
   }, [localToken, navigate, dispatch])
 
-  const handleLogout = () => {
-    dispatch(userLogOut())
-    navigate('/login')
-  }
+  useEffect(() => {
+    socket.on('newChannel', (payload) => {
+      dispatch(addNewChannel(payload))
+      setActiveChannel(payload)
+    })
+    return () => socket.off('newChannel')
+  }, [dispatch])
 
   return (
-    <div className="vh-100 d-flex flex-column">
-      <header className="bg-light border-bottom p-2">
-        <button
-          className="btn btn-outline-danger float-end"
-          onClick={handleLogout}
-        >
-          Выйти
-        </button>
-      </header>
-      <main className="flex-grow-1 d-flex">
-        <aside
-          className="bg-light p-3 border-end flex-shrink-0"
-          style={{ width: '250px' }}
-        >
+    <Container
+      fluid
+      className="vh-100 d-flex flex-column p-0"
+      style={{ overflow: 'hidden' }}
+    >
+      <Header />
+      <Row className="flex-grow-1">
+        <Col md={3} className="bg-light p-3 border-end">
           <ChannelsList
             channels={channels}
             activeChannel={activeChannel}
             onChannelClick={setActiveChannel}
           />
-        </aside>
-        <section className="d-flex flex-column flex-grow-1">
-          {activeChannel ? (
-            <ChatWindow activeChannel={activeChannel} />
-          ) : (
-            <div className="d-flex justify-content-center align-items-center h-100">
-              <p>Выберите канал</p>
-            </div>
-          )}
-        </section>
-      </main>
-    </div>
+        </Col>
+        <Col md={9} className="d-flex flex-column p-0">
+          <ChatWindow activeChannel={activeChannel} localToken={localToken} />
+        </Col>
+      </Row>
+    </Container>
   )
 }
 

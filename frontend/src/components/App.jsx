@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage from './LoginPage.jsx'
 import HomePage from './HomePage.jsx'
+import NotFoundPage from './NotFoundPage.jsx'
+import SignupPage from './SignupPage.jsx'
 
 const App = () => {
   return (
@@ -8,7 +10,9 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<HomePage />} />
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/notfound" element={<NotFoundPage />} />
+        <Route path="*" element={<Navigate to="/notfound" />} />
       </Routes>
     </BrowserRouter>
   )

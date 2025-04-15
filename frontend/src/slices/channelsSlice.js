@@ -11,11 +11,19 @@ const channelsSlice = createSlice({
     addChannels: (state, { payload }) => {
       state.channels = payload
     },
-    addOneChannel: (state, { payload }) => {
+    addNewChannel: (state, { payload }) => {
       state.channels.push(payload)
+    },
+    removeChannel: (state, { payload }) => {
+      state.channels = state.channels.filter((c) => c.id !== payload.id)
+    },
+    renameChannel: (state, { payload }) => {
+      const channel = state.channels.find((c) => c.id === payload.id)
+      if (channel) channel.name = payload.name
     },
   },
 })
 
-export const { addChannels, addOneChannel } = channelsSlice.actions
+export const { addChannels, addNewChannel, removeChannel, renameChannel } =
+  channelsSlice.actions
 export default channelsSlice.reducer

@@ -1,50 +1,59 @@
-// src/components/ChatWindow.jsx
-import React, { useEffect } from 'react' // Добавьте useEffect здесь
 import { Card } from 'react-bootstrap'
-import socket from '../socket' // Подключаем сокет
 import { useSelector } from 'react-redux'
+import { useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
-import { addOneMessage } from '../slices/messagesSlice'
-import MessageForm from './MessageForm.jsx' // Импортируем форму
+import socket from '../socket.js'
+import MessageForm from './MessageForm.jsx'
+import { addNewMessage, getMessages } from '../slices/messagesSlice.js'
 
-const ChatWindow = ({ activeChannel }) => {
+const ChatWindow = ({ localToken, activeChannel }) => {
   const dispatch = useDispatch()
-  const messages = useSelector((state) =>
-    state.messages.messages.filter((msg) => msg.channelId === activeChannel?.id)
+  const messages = useSelector((state) => state.messages.messages)
+  const filteredMessages = messages.filter(
+    (message) => message.channelId === activeChannel?.id
   )
+  const messagesEndRef = useRef(null)
 
-  // Подписываемся на события WebSocket
   useEffect(() => {
-    if (!activeChannel) return // Проверяем наличие активного канала
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [filteredMessages])
 
-    socket.on('new_message', (message) => {
-      if (message.channelId === activeChannel.id) {
-        dispatch(addOneMessage(message))
-      }
+  useEffect(() => {
+    dispatch(getMessages(localToken))
+  }, [dispatch, localToken])
+
+  useEffect(() => {
+    socket.on('newMessage', (payload) => {
+      dispatch(addNewMessage(payload))
     })
 
-    return () => {
-      socket.off('new_message') // Удаляем обработчик при размонтировании
-    }
-  }, [dispatch, activeChannel])
+    return () => socket.off('newMessage')
+  }, [dispatch])
 
   return (
     <>
-      <div className="bg-light border-bottom p-3">
-        <h5 className="mb-0">{activeChannel?.name}</h5>
-      </div>
-      <Card className="flex-grow-1 rounded-0 border-0">
-        <Card.Body className="d-flex flex-column overflow-auto">
-          {messages.map((msg) => (
-            <div key={msg.id} className="mb-2">
-              <p>{msg.text}</p>
+      {activeChannel && (
+        <div className="bg-light border-bottom p-3">
+          <h5 className="mb-0">{`# ${activeChannel.name}`}</h5>
+        </div>
+      )}
+      <Card className="flex-grow-1 rounded-0 border-0 d-flex flex-column">
+        <Card.Body className="overflow-auto" style={{ maxHeight: '79vh' }}>
+          {filteredMessages.map((message) => (
+            <div
+              key={message.id}
+              className="mb-2"
+              style={{ wordWrap: 'break-word' }}
+            >
+              <strong>{message.username}:</strong> {message.body}
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </Card.Body>
       </Card>
-      <MessageForm activeChannel={activeChannel} />
+      <MessageForm localToken={localToken} activeChannel={activeChannel} />
     </>
   )
 }
 
-export default React.memo(ChatWindow)
+export default ChatWindow
