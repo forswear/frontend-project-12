@@ -3,9 +3,11 @@ import { useFormik } from 'formik'
 import * as yup from 'yup'
 import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
+import { useDispatch } from 'react-redux'
 
 const ModalNewChat = ({ showModal, setShowModal, channels }) => {
   const [disabled, setDisabled] = useState(false)
+  const dispatch = useDispatch()
 
   const validationSchema = yup.object({
     newChannelName: yup

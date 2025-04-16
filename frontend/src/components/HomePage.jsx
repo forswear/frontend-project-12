@@ -34,9 +34,9 @@ const HomePage = () => {
     } else {
       const fetchChannels = async () => {
         try {
-          const channels = await getChannels(localToken)
-          dispatch(addChannels(channels))
-          setActiveChannel(channels[0])
+          const channelsData = await getChannels(localToken)
+          dispatch(addChannels(channelsData))
+          setActiveChannel(channelsData[0])
         } catch (error) {
           console.error(error)
         }
@@ -47,11 +47,13 @@ const HomePage = () => {
 
   useEffect(() => {
     socket.on('newChannel', (payload) => {
-      dispatch(addNewChannel(payload))
-      setActiveChannel(payload)
+      if (!channels.some((channel) => channel.id === payload.id)) {
+        dispatch(addNewChannel(payload))
+        setActiveChannel(payload)
+      }
     })
     return () => socket.off('newChannel')
-  }, [dispatch])
+  }, [dispatch, channels])
 
   return (
     <Container
