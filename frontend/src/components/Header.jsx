@@ -1,7 +1,8 @@
 import React from 'react'
-import { Button } from 'react-bootstrap'
+import { Button, Navbar, Container } from 'react-bootstrap'
 import { useDispatch } from 'react-redux'
 import { userLogOut } from '../slices/authSlice.js'
+import { Link } from 'react-router-dom'
 
 const Header = () => {
   const dispatch = useDispatch()
@@ -10,11 +11,16 @@ const Header = () => {
   }
 
   return (
-    <div className="bg-light border-bottom p-2">
-      <Button variant="primary" onClick={handleLogout} className="float-end">
-        Выйти
-      </Button>
-    </div>
+    <Navbar bg="light" variant="light" className="border-bottom p-2">
+      <Container>
+        <Navbar.Brand as={Link} to="/">
+          Hexlet Chat
+        </Navbar.Brand>
+        <Button variant="primary" onClick={handleLogout} className="float-end">
+          Выйти
+        </Button>
+      </Container>
+    </Navbar>
   )
 }
 

@@ -1,6 +1,6 @@
 import { useFormik } from 'formik'
 import { Form, Button, Container, Alert } from 'react-bootstrap'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import axios from 'axios'
 import { userLogIn } from '../slices/authSlice.js'
@@ -59,9 +59,12 @@ const LoginPage = () => {
           </Form.Control.Feedback>
         </Form.Group>
         {error && <Alert variant="danger">{error}</Alert>}
-        <Button className="w-100" variant="primary" type="submit">
+        <Button className="w-100 mb-3" variant="primary" type="submit">
           Войти
         </Button>
+        <div className="text-center">
+          Нет аккаунта? <Link to="/signup">Регистрация</Link>
+        </div>
       </Form>
     </Container>
   )

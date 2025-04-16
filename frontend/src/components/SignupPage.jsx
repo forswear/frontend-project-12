@@ -1,35 +1,37 @@
-import { useFormik } from 'formik'
-import * as yup from 'yup'
+import React from 'react'
 import { Form, Button, Container, Alert } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import axios from 'axios'
 import { userLogIn } from '../slices/authSlice.js'
-
-const registrationSchema = yup.object({
-  username: yup
-    .string()
-    .required('Обязательное поле')
-    .min(3, 'От 3 до 20 символов')
-    .max(20, 'От 3 до 20 символов'),
-  password: yup
-    .string()
-    .required('Обязательное поле')
-    .min(6, 'Не менее 6 символов'),
-  confirmPassword: yup
-    .string()
-    .required('Подтвердите пароль')
-    .oneOf([yup.ref('password')], 'Пароли должны совпадать'),
-})
+import * as yup from 'yup'
+import { useFormik } from 'formik'
 
 const SignupPage = () => {
-  const [error, setError] = useState(null)
+  const [error, setError] = React.useState(null)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
+  // Валидация формы
+  const validationSchema = yup.object({
+    username: yup
+      .string()
+      .required('Обязательное поле')
+      .min(3, 'От 3 до 20 символов')
+      .max(20, 'От 3 до 20 символов'),
+    password: yup
+      .string()
+      .required('Обязательное поле')
+      .min(6, 'Не менее 6 символов'),
+    confirmPassword: yup
+      .string()
+      .required('Подтвердите пароль')
+      .oneOf([yup.ref('password')], 'Пароли должны совпадать'),
+  })
+
   const formik = useFormik({
     initialValues: { username: '', password: '', confirmPassword: '' },
-    validationSchema: registrationSchema,
+    validationSchema,
     onSubmit: async (values) => {
       setError(null)
       try {
