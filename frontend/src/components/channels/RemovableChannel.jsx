@@ -2,13 +2,15 @@ import { Button, Dropdown } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import socket from '../../socket'
+import { useTranslation } from 'react-i18next'
 
 const RemovableChannel = ({ channel, isActive, onClick }) => {
+  const { t } = useTranslation()
   const dispatch = useDispatch()
   const localToken = useSelector((state) => state.auth.user.token)
 
   const handleRenameChannel = () => {
-    const newName = prompt('Введите новое имя канала:')
+    const newName = prompt(t('new_channel_name'))
     if (newName && newName.trim().length >= 3 && newName.trim().length <= 20) {
       axios
         .put(
@@ -29,11 +31,7 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
   }
 
   const handleDeleteChannel = () => {
-    if (
-      window.confirm(
-        'Вы уверены, что хотите удалить этот канал? Все сообщения будут удалены.'
-      )
-    ) {
+    if (window.confirm(t('delete_confirmation'))) {
       axios
         .delete(`/api/v1/channels/${channel.id}`, {
           headers: { Authorization: `Bearer ${localToken}` },
@@ -72,9 +70,11 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
         />
         <Dropdown.Menu>
           <Dropdown.Item onClick={handleRenameChannel}>
-            Переименовать
+            {t('rename_channel')}
           </Dropdown.Item>
-          <Dropdown.Item onClick={handleDeleteChannel}>Удалить</Dropdown.Item>
+          <Dropdown.Item onClick={handleDeleteChannel}>
+            {t('delete_channel')}
+          </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
     </div>

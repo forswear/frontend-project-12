@@ -1,32 +1,33 @@
 import React from 'react'
 import { Form, Button, Container, Alert } from 'react-bootstrap'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import axios from 'axios'
 import { userLogIn } from '../slices/authSlice.js'
 import * as yup from 'yup'
 import { useFormik } from 'formik'
+import { useTranslation } from 'react-i18next'
 
 const SignupPage = () => {
+  const { t } = useTranslation()
   const [error, setError] = React.useState(null)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  // Валидация формы
   const validationSchema = yup.object({
     username: yup
       .string()
-      .required('Обязательное поле')
-      .min(3, 'От 3 до 20 символов')
-      .max(20, 'От 3 до 20 символов'),
+      .required(t('required_field'))
+      .min(3, t('min_max_length', { min: 3, max: 20 }))
+      .max(20, t('min_max_length', { min: 3, max: 20 })),
     password: yup
       .string()
-      .required('Обязательное поле')
-      .min(6, 'Не менее 6 символов'),
+      .required(t('required_field'))
+      .min(6, t('min_length', { min: 6 })),
     confirmPassword: yup
       .string()
-      .required('Подтвердите пароль')
-      .oneOf([yup.ref('password')], 'Пароли должны совпадать'),
+      .required(t('required_field'))
+      .oneOf([yup.ref('password')], t('password_mismatch')),
   })
 
   const formik = useFormik({
@@ -43,21 +44,21 @@ const SignupPage = () => {
         dispatch(userLogIn({ username, token }))
         navigate('/')
       } catch (error) {
-        setError('Такой пользователь уже существует')
+        setError(t('user_already_exists'))
       }
     },
   })
 
   return (
     <Container className="mt-5" style={{ maxWidth: '400px' }}>
-      <h1 className="text-center mb-4">Регистрация</h1>
+      <h1 className="text-center mb-4">{t('signup_title')}</h1>
       <Form onSubmit={formik.handleSubmit}>
         <Form.Group className="mb-3" controlId="username">
-          <Form.Label>Имя пользователя</Form.Label>
+          <Form.Label>{t('username')}</Form.Label>
           <Form.Control
             type="text"
             name="username"
-            placeholder="Имя пользователя"
+            placeholder={t('username')}
             onChange={formik.handleChange}
             value={formik.values.username}
             isInvalid={!!formik.errors.username}
@@ -67,11 +68,11 @@ const SignupPage = () => {
           </Form.Control.Feedback>
         </Form.Group>
         <Form.Group className="mb-3" controlId="password">
-          <Form.Label>Пароль</Form.Label>
+          <Form.Label>{t('password')}</Form.Label>
           <Form.Control
             type="password"
             name="password"
-            placeholder="Пароль"
+            placeholder={t('password')}
             onChange={formik.handleChange}
             value={formik.values.password}
             isInvalid={!!formik.errors.password}
@@ -81,11 +82,11 @@ const SignupPage = () => {
           </Form.Control.Feedback>
         </Form.Group>
         <Form.Group className="mb-3" controlId="confirmPassword">
-          <Form.Label>Подтвердите пароль</Form.Label>
+          <Form.Label>{t('confirm_password')}</Form.Label>
           <Form.Control
             type="password"
             name="confirmPassword"
-            placeholder="Подтвердите пароль"
+            placeholder={t('confirm_password')}
             onChange={formik.handleChange}
             value={formik.values.confirmPassword}
             isInvalid={!!formik.errors.confirmPassword}
@@ -95,9 +96,12 @@ const SignupPage = () => {
           </Form.Control.Feedback>
         </Form.Group>
         {error && <Alert variant="danger">{error}</Alert>}
-        <Button className="w-100" variant="primary" type="submit">
-          Зарегистрироваться
+        <Button className="w-100 mb-3" variant="primary" type="submit">
+          {t('signup_button')}
         </Button>
+        <div className="text-center">
+          {t('have_account')} <Link to="/login">{t('login_link')}</Link>
+        </div>
       </Form>
     </Container>
   )

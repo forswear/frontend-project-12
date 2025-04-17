@@ -4,8 +4,10 @@ import { useFormik } from 'formik'
 import socket from '../socket'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 const MessageForm = ({ activeChannel }) => {
+  const { t } = useTranslation()
   const token = useSelector((state) => state.auth.user.token)
 
   const formik = useFormik({
@@ -40,7 +42,7 @@ const MessageForm = ({ activeChannel }) => {
         <Form.Control
           as="textarea"
           rows={2}
-          placeholder="Сообщение..."
+          placeholder={t('message_placeholder')}
           style={{ resize: 'none', flexGrow: 1 }}
           id="message"
           name="message"
@@ -48,7 +50,7 @@ const MessageForm = ({ activeChannel }) => {
           onChange={formik.handleChange}
         />
         <Button variant="primary" className="ms-2" type="submit">
-          Отправить
+          {t('send')}
         </Button>
       </Form.Group>
     </Form>

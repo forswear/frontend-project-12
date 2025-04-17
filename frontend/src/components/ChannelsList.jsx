@@ -3,8 +3,10 @@ import { useState, useEffect, useRef } from 'react'
 import ModalNewChat from './ModalNewChat.jsx'
 import RemovableChannel from './channels/RemovableChannel.jsx'
 import UnremovableChannel from './channels/UnremovableChannel.jsx'
+import { useTranslation } from 'react-i18next'
 
 const ChannelList = ({ channels, activeChannel, onChannelClick }) => {
+  const { t } = useTranslation()
   const [showModal, setShowModal] = useState(false)
   const activeChannelRef = useRef(null)
 
@@ -19,7 +21,7 @@ const ChannelList = ({ channels, activeChannel, onChannelClick }) => {
       {activeChannel && channels.length ? (
         <div className="d-flex flex-column p-0" style={{ height: '91vh' }}>
           <div className="d-flex justify-content-between align-items-center mb-3">
-            <h4 className="mb-0">Каналы</h4>
+            <h4 className="mb-0">{t('channels')}</h4>
             <Button
               variant="outline-primary"
               size="sm"
@@ -57,7 +59,7 @@ const ChannelList = ({ channels, activeChannel, onChannelClick }) => {
           </ListGroup>
         </div>
       ) : (
-        <p>Нет доступных каналов.</p>
+        <p>{t('no_channels')}</p>
       )}
       <ModalNewChat
         showModal={showModal}

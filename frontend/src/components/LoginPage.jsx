@@ -5,8 +5,10 @@ import { useDispatch } from 'react-redux'
 import axios from 'axios'
 import { userLogIn } from '../slices/authSlice.js'
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 const LoginPage = () => {
+  const { t } = useTranslation()
   const [error, setError] = useState(null)
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -21,21 +23,21 @@ const LoginPage = () => {
         dispatch(userLogIn({ username, token }))
         navigate('/')
       } catch (error) {
-        setError('Неверные имя пользователя или пароль')
+        setError(t('user_already_exists'))
       }
     },
   })
 
   return (
     <Container className="mt-5" style={{ maxWidth: '400px' }}>
-      <h1 className="text-center mb-4">Войти</h1>
+      <h1 className="text-center mb-4">{t('login_title')}</h1>
       <Form onSubmit={formik.handleSubmit}>
         <Form.Group className="mb-3" controlId="username">
-          <Form.Label>Имя пользователя</Form.Label>
+          <Form.Label>{t('username')}</Form.Label>
           <Form.Control
             type="text"
             name="username"
-            placeholder="Имя пользователя"
+            placeholder={t('username')}
             onChange={formik.handleChange}
             value={formik.values.username}
             isInvalid={!!formik.errors.username}
@@ -45,11 +47,11 @@ const LoginPage = () => {
           </Form.Control.Feedback>
         </Form.Group>
         <Form.Group className="mb-3" controlId="password">
-          <Form.Label>Пароль</Form.Label>
+          <Form.Label>{t('password')}</Form.Label>
           <Form.Control
             type="password"
             name="password"
-            placeholder="Пароль"
+            placeholder={t('password')}
             onChange={formik.handleChange}
             value={formik.values.password}
             isInvalid={!!formik.errors.password}
@@ -60,10 +62,10 @@ const LoginPage = () => {
         </Form.Group>
         {error && <Alert variant="danger">{error}</Alert>}
         <Button className="w-100 mb-3" variant="primary" type="submit">
-          Войти
+          {t('login_button')}
         </Button>
         <div className="text-center">
-          Нет аккаунта? <Link to="/signup">Регистрация</Link>
+          {t('no_account')} <Link to="/signup">{t('registration_link')}</Link>
         </div>
       </Form>
     </Container>
