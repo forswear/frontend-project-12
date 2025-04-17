@@ -29,6 +29,8 @@ i18n.use(initReactI18next).init({
         channel_name: 'Имя канала',
         cancel: 'Отменить',
         submit: 'Отправить',
+        select_channel: 'Выберите канал',
+        no_messages: 'Нет сообщений',
         rename_channel: 'Переименовать канал',
         delete_channel: 'Удалить канал',
         delete_confirmation:

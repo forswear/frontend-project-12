@@ -9,30 +9,41 @@ import { useTranslation } from 'react-i18next'
 const MessageForm = ({ activeChannel }) => {
   const { t } = useTranslation()
   const token = useSelector((state) => state.auth.user.token)
+  const username = useSelector((state) => state.auth.user.username)
 
   const formik = useFormik({
     initialValues: { message: '' },
-    onSubmit: async (values) => {
-      socket.emit('send_message', {
-        message: values.message,
-        channelId: activeChannel.id,
-        token,
-      })
+    onSubmit: async (values, { resetForm }) => {
+      if (!values.message.trim() || !activeChannel?.id) return
 
-      await axios.post(
-        '/api/v1/messages',
-        {
-          text: values.message,
-          channelId: activeChannel.id,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+      try {
+        // Отправка сообщения через API
+        const response = await axios.post(
+          '/api/v1/messages',
+          {
+            body: values.message.trim(),
+            channelId: activeChannel.id,
+            username: username,
           },
-        }
-      )
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
 
-      formik.setFieldValue('message', '')
+        // Отправка через WebSocket
+        socket.emit('send_message', {
+          body: values.message.trim(),
+          channelId: activeChannel.id,
+          username: username,
+          id: response.data.id, // Используем ID из ответа сервера
+        })
+
+        resetForm()
+      } catch (error) {
+        console.error('Ошибка при отправке сообщения:', error)
+      }
     },
   })
 
@@ -48,8 +59,14 @@ const MessageForm = ({ activeChannel }) => {
           name="message"
           value={formik.values.message}
           onChange={formik.handleChange}
+          required
         />
-        <Button variant="primary" className="ms-2" type="submit">
+        <Button
+          variant="primary"
+          className="ms-2"
+          type="submit"
+          disabled={!formik.values.message.trim()}
+        >
           {t('send')}
         </Button>
       </Form.Group>

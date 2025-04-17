@@ -11,22 +11,31 @@ export const getMessages = createAsyncThunk(
   }
 )
 
-const initialState = {
-  messages: [],
-}
-
 const messagesSlice = createSlice({
   name: 'messages',
-  initialState,
+  initialState: {
+    messages: [],
+    loading: false,
+    error: null,
+  },
   reducers: {
-    addNewMessage: (state, { payload }) => {
-      state.messages.push(payload)
+    addNewMessage: (state, action) => {
+      state.messages.push(action.payload)
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(getMessages.fulfilled, (state, action) => {
-      state.messages = action.payload
-    })
+    builder
+      .addCase(getMessages.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(getMessages.fulfilled, (state, action) => {
+        state.loading = false
+        state.messages = action.payload
+      })
+      .addCase(getMessages.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message
+      })
   },
 })
 
