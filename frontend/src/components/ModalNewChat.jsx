@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import leoProfanity from 'leo-profanity'
 
 const ModalNewChat = ({ showModal, setShowModal, channels }) => {
   const { t } = useTranslation()
@@ -19,6 +20,9 @@ const ModalNewChat = ({ showModal, setShowModal, channels }) => {
       .max(20, t('min_max_length', { min: 3, max: 20 }))
       .test('unique-channel', t('required_field'), (value) => {
         return !channels.some((channel) => channel.name === value.trim())
+      })
+      .test('profanity-check', t('profanity_not_allowed'), (value) => {
+        return !leoProfanity.check(value.trim())
       }),
   })
 
@@ -28,10 +32,14 @@ const ModalNewChat = ({ showModal, setShowModal, channels }) => {
     onSubmit: async (values) => {
       setDisabled(true)
       const token = localStorage.getItem('token')
+
+      // Фильтрация нецензурных слов в названии канала
+      const filteredName = leoProfanity.clean(values.newChannelName.trim())
+
       try {
         await axios.post(
           '/api/v1/channels',
-          { name: values.newChannelName },
+          { name: filteredName },
           {
             headers: { Authorization: `Bearer ${token}` },
           }

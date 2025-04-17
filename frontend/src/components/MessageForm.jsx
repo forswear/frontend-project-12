@@ -1,10 +1,11 @@
 import React from 'react'
 import { Form, Button } from 'react-bootstrap'
 import { useFormik } from 'formik'
-import socket from '../socket'
+import socket from '../socket.js'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import leoProfanity from 'leo-profanity'
 
 const MessageForm = ({ activeChannel }) => {
   const { t } = useTranslation()
@@ -16,12 +17,14 @@ const MessageForm = ({ activeChannel }) => {
     onSubmit: async (values, { resetForm }) => {
       if (!values.message.trim() || !activeChannel?.id) return
 
+      // Фильтрация нецензурных слов в сообщении
+      const filteredMessage = leoProfanity.clean(values.message.trim())
+
       try {
-        // Отправка сообщения через API
         const response = await axios.post(
           '/api/v1/messages',
           {
-            body: values.message.trim(),
+            body: filteredMessage,
             channelId: activeChannel.id,
             username: username,
           },
@@ -32,12 +35,11 @@ const MessageForm = ({ activeChannel }) => {
           }
         )
 
-        // Отправка через WebSocket
         socket.emit('send_message', {
-          body: values.message.trim(),
+          body: filteredMessage,
           channelId: activeChannel.id,
           username: username,
-          id: response.data.id, // Используем ID из ответа сервера
+          id: response.data.id,
         })
 
         resetForm()

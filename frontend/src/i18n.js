@@ -45,6 +45,7 @@ i18n.use(initReactI18next).init({
         error_renaming_channel: 'Ошибка при переименовании канала.',
         channel_deleted_successfully: 'Канал успешно удален.',
         error_deleting_channel: 'Ошибка при удалении канала.',
+        profanity_not_allowed: 'Название содержит недопустимые слова',
       },
     },
   },
