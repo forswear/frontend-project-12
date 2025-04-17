@@ -2,6 +2,7 @@ import { Button, Dropdown } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import socket from '../../socket'
+import { toast } from 'react-toastify' // Импортируем toast
 import { useTranslation } from 'react-i18next'
 
 const RemovableChannel = ({ channel, isActive, onClick }) => {
@@ -25,8 +26,16 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
             type: 'channels/renameChannel',
             payload: { id: channel.id, name: newName },
           })
+
+          // Показываем уведомление о переименовании
+          toast.success(t('channel_renamed_successfully'))
         })
-        .catch((err) => console.error(err))
+        .catch((err) => {
+          console.error(err)
+
+          // Показываем уведомление об ошибке
+          toast.error(t('error_renaming_channel'))
+        })
     }
   }
 
@@ -42,8 +51,16 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
             payload: { id: channel.id },
           })
           socket.emit('removeChannel', { channelId: channel.id })
+
+          // Показываем уведомление об удалении
+          toast.success(t('channel_deleted_successfully'))
         })
-        .catch((err) => console.error(err))
+        .catch((err) => {
+          console.error(err)
+
+          // Показываем уведомление об ошибке
+          toast.error(t('error_deleting_channel'))
+        })
     }
   }
 

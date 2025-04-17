@@ -1,6 +1,6 @@
-import React from 'react'
 import { Button, Navbar, Container } from 'react-bootstrap'
 import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom' // Добавляем хук useNavigate
 import { userLogOut } from '../slices/authSlice.js'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -8,8 +8,11 @@ import { useTranslation } from 'react-i18next'
 const Header = () => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
+  const navigate = useNavigate() // Инициализируем useNavigate
+
   const handleLogout = () => {
-    dispatch(userLogOut())
+    dispatch(userLogOut()) // Выполняем логаут
+    navigate('/login', { replace: true }) // Редирект на страницу входа
   }
 
   return (

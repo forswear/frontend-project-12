@@ -1,13 +1,19 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
+import { toast } from 'react-toastify' // Импортируем toast
+import { useTranslation } from 'react-i18next'
 
 export const getMessages = createAsyncThunk(
   'messages/getMessages',
-  async (token) => {
-    const response = await axios.get('/api/v1/messages', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    return response.data
+  async (token, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('/api/v1/messages', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      return response.data
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message)
+    }
   }
 )
 
@@ -27,6 +33,7 @@ const messagesSlice = createSlice({
     builder
       .addCase(getMessages.pending, (state) => {
         state.loading = true
+        state.error = null
       })
       .addCase(getMessages.fulfilled, (state, action) => {
         state.loading = false
@@ -34,7 +41,11 @@ const messagesSlice = createSlice({
       })
       .addCase(getMessages.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message
+        state.error = action.payload
+
+        // Показываем всплывающее уведомление об ошибке
+        const { t } = useTranslation()
+        toast.error(t('error_loading_messages'))
       })
   },
 })
