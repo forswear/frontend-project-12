@@ -7,7 +7,7 @@ import { addNewChannel, addChannels } from '../slices/channelsSlice.js'
 import Header from './Header.jsx'
 import ChannelsList from './ChannelsList.jsx'
 import ChatWindow from './ChatWindow.jsx'
-import socket from '../socket.js'
+import { initializeSocket } from '../socket' // Используем именованный экспорт
 
 const getChannels = async (userToken) => {
   try {
@@ -45,6 +45,8 @@ const HomePage = () => {
     }
   }, [localToken, navigate, dispatch])
 
+  const socket = initializeSocket() // Инициализируем WebSocket при необходимости
+
   useEffect(() => {
     socket.on('newChannel', (payload) => {
       if (!channels.some((channel) => channel.id === payload.id)) {
@@ -53,7 +55,7 @@ const HomePage = () => {
       }
     })
     return () => socket.off('newChannel')
-  }, [dispatch, channels])
+  }, [dispatch, channels, socket])
 
   return (
     <Container

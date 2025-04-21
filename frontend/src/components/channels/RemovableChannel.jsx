@@ -1,14 +1,15 @@
 import { Button, Dropdown } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
-import socket from '../../socket'
-import { toast } from 'react-toastify' // Импортируем toast
+import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
+import { initializeSocket } from '../../socket' // Используем именованный экспорт
 
 const RemovableChannel = ({ channel, isActive, onClick }) => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
   const localToken = useSelector((state) => state.auth.user.token)
+  const socket = initializeSocket() // Инициализируем WebSocket при необходимости
 
   const handleRenameChannel = () => {
     const newName = prompt(t('new_channel_name'))
@@ -26,14 +27,10 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
             type: 'channels/renameChannel',
             payload: { id: channel.id, name: newName },
           })
-
-          // Показываем уведомление о переименовании
           toast.success(t('channel_renamed_successfully'))
         })
         .catch((err) => {
           console.error(err)
-
-          // Показываем уведомление об ошибке
           toast.error(t('error_renaming_channel'))
         })
     }
@@ -50,15 +47,11 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
             type: 'channels/removeChannel',
             payload: { id: channel.id },
           })
-          socket.emit('removeChannel', { channelId: channel.id })
-
-          // Показываем уведомление об удалении
+          socket.emit('removeChannel', { channelId: channel.id }) // Используем инициализированный socket
           toast.success(t('channel_deleted_successfully'))
         })
         .catch((err) => {
           console.error(err)
-
-          // Показываем уведомление об ошибке
           toast.error(t('error_deleting_channel'))
         })
     }

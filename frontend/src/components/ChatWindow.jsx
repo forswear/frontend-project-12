@@ -2,7 +2,7 @@ import { Card } from 'react-bootstrap'
 import { useSelector } from 'react-redux'
 import { useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
-import socket from '../socket.js'
+import { initializeSocket } from '../socket' // Используем именованный экспорт
 import MessageForm from './MessageForm.jsx'
 import { addNewMessage, getMessages } from '../slices/messagesSlice.js'
 import { useTranslation } from 'react-i18next'
@@ -13,27 +13,24 @@ const ChatWindow = ({ localToken, activeChannel }) => {
   const messages = useSelector((state) => state.messages.messages)
   const messagesEndRef = useRef(null)
 
-  // Фильтрация сообщений по активному каналу
   const filteredMessages = messages.filter(
     (message) => message.channelId === activeChannel?.id
   )
 
-  // Автопрокрутка к новым сообщениям
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [filteredMessages])
 
-  // Загрузка сообщений при монтировании и смене канала
   useEffect(() => {
     if (localToken) {
       dispatch(getMessages(localToken))
     }
   }, [dispatch, localToken, activeChannel?.id])
 
-  // Подписка на новые сообщения через WebSocket
+  const socket = initializeSocket() // Инициализируем WebSocket при необходимости
+
   useEffect(() => {
     const handleNewMessage = (payload) => {
-      // Проверяем структуру данных
       if (payload && payload.body && payload.channelId && payload.username) {
         dispatch(
           addNewMessage({
@@ -45,13 +42,11 @@ const ChatWindow = ({ localToken, activeChannel }) => {
         )
       }
     }
-
     socket.on('newMessage', handleNewMessage)
-
     return () => {
       socket.off('newMessage', handleNewMessage)
     }
-  }, [dispatch])
+  }, [dispatch, socket])
 
   if (!activeChannel) {
     return <div className="p-3">{t('select_channel')}</div>
