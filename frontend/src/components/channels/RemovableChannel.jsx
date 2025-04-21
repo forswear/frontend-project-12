@@ -14,14 +14,11 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
   const handleRenameChannel = () => {
     const newName = prompt(t('new_channel_name'))
     if (newName && newName.trim().length >= 3 && newName.trim().length <= 20) {
+      const channelId = channel.id
+      const authHeader = { headers: { Authorization: `Bearer ${localToken}` } }
       axios
-        .put(
-          `/api/v1/channels/${channel.id}`,
-          { name: newName },
-          {
-            headers: { Authorization: `Bearer ${localToken}` },
-          }
-        )
+        .put(`/api/v1/channels/${channelId}`, { name: newName }, authHeader)
+
         .then(() => {
           dispatch({
             type: 'channels/renameChannel',

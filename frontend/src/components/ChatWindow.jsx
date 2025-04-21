@@ -13,8 +13,9 @@ const ChatWindow = ({ localToken, activeChannel }) => {
   const messages = useSelector((state) => state.messages.messages)
   const messagesEndRef = useRef(null)
 
+  const currentChannelId = activeChannel?.id
   const filteredMessages = messages.filter(
-    (message) => message.channelId === activeChannel?.id
+    (message) => message.channelId === currentChannelId
   )
 
   useEffect(() => {

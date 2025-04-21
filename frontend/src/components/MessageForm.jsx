@@ -20,19 +20,18 @@ const MessageForm = ({ activeChannel }) => {
 
       const filteredMessage = leoProfanity.clean(values.message.trim())
       try {
+        const messageData = {
+          body: filteredMessage,
+          channelId: activeChannel.id,
+          username: username,
+        }
+        const authHeader = { headers: { Authorization: `Bearer ${token}` } }
         const response = await axios.post(
           '/api/v1/messages',
-          {
-            body: filteredMessage,
-            channelId: activeChannel.id,
-            username: username,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          messageData,
+          authHeader
         )
+
         socket.emit('send_message', {
           body: filteredMessage,
           channelId: activeChannel.id,

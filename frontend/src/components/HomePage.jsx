@@ -35,8 +35,9 @@ const HomePage = () => {
       const fetchChannels = async () => {
         try {
           const channelsData = await getChannels(localToken)
+          const firstChannel = channelsData[0]
           dispatch(addChannels(channelsData))
-          setActiveChannel(channelsData[0])
+          setActiveChannel(firstChannel)
         } catch (error) {
           console.error(error)
         }
