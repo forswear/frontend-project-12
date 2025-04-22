@@ -1,6 +1,7 @@
+// Header.jsx
 import { Button, Navbar, Container } from 'react-bootstrap'
-import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom' // Добавляем хук useNavigate
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { userLogOut } from '../slices/authSlice.js'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -8,22 +9,29 @@ import { useTranslation } from 'react-i18next'
 const Header = () => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
-  const navigate = useNavigate() // Инициализируем useNavigate
+  const navigate = useNavigate()
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
 
   const handleLogout = () => {
-    dispatch(userLogOut()) // Выполняем логаут
-    navigate('/login', { replace: true }) // Редирект на страницу входа
+    dispatch(userLogOut())
+    navigate('/login', { replace: true })
   }
 
   return (
     <Navbar bg="light" variant="light" className="border-bottom p-2">
       <Container>
         <Navbar.Brand as={Link} to="/">
-          {t('hexlet_chat')}
+          {t('hexlet_chat')} {}
         </Navbar.Brand>
-        <Button variant="primary" onClick={handleLogout} className="float-end">
-          {t('logout')}
-        </Button>
+        {isAuthenticated ? (
+          <Button
+            variant="primary"
+            onClick={handleLogout}
+            className="float-end"
+          >
+            {t('logout')} {/* Перевод текста кнопки выхода */}
+          </Button>
+        ) : null}
       </Container>
     </Navbar>
   )
