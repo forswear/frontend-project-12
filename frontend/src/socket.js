@@ -1,3 +1,4 @@
+// src/socket.js
 import io from 'socket.io-client'
 
 let socket = null
@@ -23,6 +24,33 @@ export const initializeSocket = (token) => {
 
     socket.on('disconnect', () => {
       console.log('WebSocket disconnected')
+    })
+
+    socket.on('newChannel', (payload) => {
+      const eventHandler = window.dispatchEvent(
+        new CustomEvent('newChannel', { detail: payload })
+      )
+      if (!eventHandler.defaultPrevented) {
+        console.warn("No handler for 'newChannel'")
+      }
+    })
+
+    socket.on('newMessage', (payload) => {
+      const eventHandler = window.dispatchEvent(
+        new CustomEvent('newMessage', { detail: payload })
+      )
+      if (!eventHandler.defaultPrevented) {
+        console.warn("No handler for 'newMessage'")
+      }
+    })
+
+    socket.on('removeChannel', (payload) => {
+      const eventHandler = window.dispatchEvent(
+        new CustomEvent('removeChannel', { detail: payload })
+      )
+      if (!eventHandler.defaultPrevented) {
+        console.warn("No handler for 'removeChannel'")
+      }
     })
   }
   return socket

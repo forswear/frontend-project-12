@@ -1,13 +1,13 @@
+// src/components/HomePage.jsx
 import { Container, Row, Col } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
-import { addNewChannel, addChannels } from '../slices/channelsSlice.js'
+import { addChannels } from '../slices/channelsSlice.js'
 import Header from './Header.jsx'
 import ChannelsList from './ChannelsList.jsx'
 import ChatWindow from './ChatWindow.jsx'
-import { initializeSocket } from '../socket'
 
 const getChannels = async (userToken) => {
   const response = await axios.get('/api/v1/channels', {
@@ -42,19 +42,6 @@ const HomePage = () => {
 
     fetchChannels()
   }, [dispatch, isAuthenticated, navigate, token])
-
-  const socket = initializeSocket(token)
-
-  useEffect(() => {
-    socket.on('newChannel', (payload) => {
-      if (!channels.some((channel) => channel.id === payload.id)) {
-        dispatch(addNewChannel(payload))
-        setActiveChannel(payload)
-      }
-    })
-
-    return () => socket.off('newChannel')
-  }, [dispatch, channels, socket])
 
   return (
     <Container
