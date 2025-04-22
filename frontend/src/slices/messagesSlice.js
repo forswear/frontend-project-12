@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
-import { toast } from 'react-toastify' // Импортируем toast
+import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
 
 export const getMessages = createAsyncThunk(
@@ -26,7 +26,12 @@ const messagesSlice = createSlice({
   },
   reducers: {
     addNewMessage: (state, action) => {
-      state.messages.push(action.payload)
+      const messageExists = state.messages.some(
+        (msg) => msg.id === action.payload.id
+      )
+      if (!messageExists) {
+        state.messages.push(action.payload)
+      }
     },
   },
   extraReducers: (builder) => {
@@ -42,8 +47,6 @@ const messagesSlice = createSlice({
       .addCase(getMessages.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
-
-        // Показываем всплывающее уведомление об ошибке
         const { t } = useTranslation()
         toast.error(t('error_loading_messages'))
       })

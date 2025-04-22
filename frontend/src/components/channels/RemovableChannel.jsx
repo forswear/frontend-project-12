@@ -1,4 +1,3 @@
-// src/components/channels/RemovableChannel.jsx
 import { Button, Dropdown } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'

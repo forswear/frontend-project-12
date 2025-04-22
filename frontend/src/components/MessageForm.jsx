@@ -1,7 +1,5 @@
-// src/components/MessageForm.jsx
 import { Form, Button } from 'react-bootstrap'
 import { useFormik } from 'formik'
-import { initializeSocket } from '../socket'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -12,8 +10,6 @@ const MessageForm = ({ activeChannel }) => {
   const { t } = useTranslation()
   const token = useSelector((state) => state.auth.user.token)
   const username = useSelector((state) => state.auth.user.username)
-
-  const socket = initializeSocket()
 
   const formik = useFormik({
     initialValues: { message: '' },
@@ -30,16 +26,7 @@ const MessageForm = ({ activeChannel }) => {
 
         const authHeader = { headers: { Authorization: `Bearer ${token}` } }
 
-        const response = await axios.post(
-          `${API_BASE_URL}messages`,
-          messageData,
-          authHeader
-        )
-
-        socket.emit('send_message', {
-          ...messageData,
-          id: response.data.id,
-        })
+        await axios.post(`${API_BASE_URL}messages`, messageData, authHeader)
 
         resetForm()
       } catch (error) {

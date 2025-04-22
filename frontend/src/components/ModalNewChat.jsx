@@ -1,4 +1,3 @@
-// src/components/ModalNewChat.jsx
 import { Modal, Form, Button } from 'react-bootstrap'
 import { useFormik } from 'formik'
 import * as yup from 'yup'

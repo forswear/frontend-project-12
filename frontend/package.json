@@ -8,7 +8,8 @@
     "start": "npx start-server -s ./dist",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "serve": "vite preview"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.6.1",
