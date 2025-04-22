@@ -1,3 +1,4 @@
+// src/components/SignupPage.jsx
 import React from 'react'
 import { Form, Button, Container, Alert } from 'react-bootstrap'
 import { useNavigate, Link } from 'react-router-dom'
@@ -7,6 +8,7 @@ import { userLogIn } from '../slices/authSlice.js'
 import * as yup from 'yup'
 import { useFormik } from 'formik'
 import { useTranslation } from 'react-i18next'
+import { API_BASE_URL } from '../api'
 
 const SignupPage = () => {
   const { t } = useTranslation()
@@ -36,7 +38,7 @@ const SignupPage = () => {
     onSubmit: async (values) => {
       setError(null)
       try {
-        const response = await axios.post('/api/v1/signup', {
+        const response = await axios.post(`${API_BASE_URL}signup`, {
           username: values.username,
           password: values.password,
         })

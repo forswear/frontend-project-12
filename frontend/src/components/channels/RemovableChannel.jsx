@@ -3,13 +3,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
-import { initializeSocket } from '../../socket' // Используем именованный экспорт
+import { initializeSocket } from '../../socket'
+import { API_BASE_URL } from '../../api'
 
 const RemovableChannel = ({ channel, isActive, onClick }) => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
   const localToken = useSelector((state) => state.auth.user.token)
-  const socket = initializeSocket() // Инициализируем WebSocket при необходимости
+  const socket = initializeSocket()
 
   const handleRenameChannel = () => {
     const newName = prompt(t('new_channel_name'))
@@ -17,8 +18,11 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
       const channelId = channel.id
       const authHeader = { headers: { Authorization: `Bearer ${localToken}` } }
       axios
-        .put(`/api/v1/channels/${channelId}`, { name: newName }, authHeader)
-
+        .put(
+          `${API_BASE_URL}channels/${channelId}`,
+          { name: newName },
+          authHeader
+        )
         .then(() => {
           dispatch({
             type: 'channels/renameChannel',
@@ -36,7 +40,7 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
   const handleDeleteChannel = () => {
     if (window.confirm(t('delete_confirmation'))) {
       axios
-        .delete(`/api/v1/channels/${channel.id}`, {
+        .delete(`${API_BASE_URL}channels/${channel.id}`, {
           headers: { Authorization: `Bearer ${localToken}` },
         })
         .then(() => {
@@ -44,7 +48,7 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
             type: 'channels/removeChannel',
             payload: { id: channel.id },
           })
-          socket.emit('removeChannel', { channelId: channel.id }) // Используем инициализированный socket
+          socket.emit('removeChannel', { channelId: channel.id })
           toast.success(t('channel_deleted_successfully'))
         })
         .catch((err) => {
@@ -68,7 +72,7 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
           whiteSpace: 'nowrap',
         }}
       >
-        # {channel.name}
+        #{channel.name}
       </Button>
       <Dropdown align="end" drop="down" className="rounded-0">
         <Dropdown.Toggle

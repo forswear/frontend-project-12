@@ -1,3 +1,4 @@
+// src/components/ModalNewChat.jsx
 import { Modal, Form, Button } from 'react-bootstrap'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
@@ -7,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import leoProfanity from 'leo-profanity'
 import { closeModal } from '../slices/modalSlice'
+import { API_BASE_URL } from '../api'
 
 const ModalNewChat = () => {
   const { t } = useTranslation()
@@ -40,7 +42,7 @@ const ModalNewChat = () => {
 
       try {
         await axios.post(
-          '/api/v1/channels',
+          `${API_BASE_URL}channels`,
           { name: filteredName },
           {
             headers: { Authorization: `Bearer ${token}` },

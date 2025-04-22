@@ -1,3 +1,4 @@
+// src/components/MessageForm.jsx
 import { Form, Button } from 'react-bootstrap'
 import { useFormik } from 'formik'
 import { initializeSocket } from '../socket'
@@ -5,6 +6,7 @@ import axios from 'axios'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import leoProfanity from 'leo-profanity'
+import { API_BASE_URL } from '../api'
 
 const MessageForm = ({ activeChannel }) => {
   const { t } = useTranslation()
@@ -29,7 +31,7 @@ const MessageForm = ({ activeChannel }) => {
         const authHeader = { headers: { Authorization: `Bearer ${token}` } }
 
         const response = await axios.post(
-          '/api/v1/messages',
+          `${API_BASE_URL}messages`,
           messageData,
           authHeader
         )
