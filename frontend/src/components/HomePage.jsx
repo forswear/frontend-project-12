@@ -10,15 +10,10 @@ import ChatWindow from './ChatWindow.jsx'
 import { initializeSocket } from '../socket'
 
 const getChannels = async (userToken) => {
-  try {
-    const response = await axios.get('/api/v1/channels', {
-      headers: { Authorization: `Bearer ${userToken}` },
-    })
-    return response.data
-  } catch (err) {
-    console.error(err)
-    throw err
-  }
+  const response = await axios.get('/api/v1/channels', {
+    headers: { Authorization: `Bearer ${userToken}` },
+  })
+  return response.data
 }
 
 const HomePage = () => {
@@ -32,22 +27,23 @@ const HomePage = () => {
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login')
-    } else {
-      const fetchChannels = async () => {
-        try {
-          const channelsData = await getChannels(token)
-          const firstChannel = channelsData[0]
-          dispatch(addChannels(channelsData))
-          setActiveChannel(firstChannel)
-        } catch (error) {
-          console.error(error)
-        }
-      }
-      fetchChannels()
+      return
     }
-  }, [token, isAuthenticated, navigate, dispatch])
 
-  const socket = initializeSocket()
+    const fetchChannels = async () => {
+      try {
+        const channelsData = await getChannels(token)
+        dispatch(addChannels(channelsData))
+        setActiveChannel(channelsData[0])
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    fetchChannels()
+  }, [dispatch, isAuthenticated, navigate, token])
+
+  const socket = initializeSocket(token)
 
   useEffect(() => {
     socket.on('newChannel', (payload) => {
@@ -56,6 +52,7 @@ const HomePage = () => {
         setActiveChannel(payload)
       }
     })
+
     return () => socket.off('newChannel')
   }, [dispatch, channels, socket])
 

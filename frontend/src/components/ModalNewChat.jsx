@@ -14,6 +14,7 @@ const ModalNewChat = () => {
   const dispatch = useDispatch()
   const { isModalOpen, modalType } = useSelector((state) => state.modal)
   const channels = useSelector((state) => state.channels.channels)
+  const token = useSelector((state) => state.auth.user.token)
 
   const validationSchema = yup.object({
     newChannelName: yup
@@ -34,7 +35,6 @@ const ModalNewChat = () => {
     validationSchema,
     onSubmit: async (values) => {
       setDisabled(true)
-      const token = localStorage.getItem('token')
 
       const filteredName = leoProfanity.clean(values.newChannelName.trim())
 

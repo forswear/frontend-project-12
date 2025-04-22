@@ -2,11 +2,11 @@ import io from 'socket.io-client'
 
 let socket = null
 
-export const initializeSocket = () => {
+export const initializeSocket = (token) => {
   if (!socket) {
     const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001'
     socket = io(serverUrl, {
-      auth: { token: localStorage.getItem('token') },
+      auth: { token },
       autoConnect: true,
       reconnection: true,
       reconnectionAttempts: 5,
