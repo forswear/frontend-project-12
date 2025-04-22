@@ -1,20 +1,27 @@
 import { ListGroup, Button } from 'react-bootstrap'
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import ModalNewChat from './ModalNewChat.jsx'
 import RemovableChannel from './channels/RemovableChannel.jsx'
 import UnremovableChannel from './channels/UnremovableChannel.jsx'
 import { useTranslation } from 'react-i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { openModal } from '../slices/modalSlice'
 
 const ChannelList = ({ channels, activeChannel, onChannelClick }) => {
   const { t } = useTranslation()
-  const [showModal, setShowModal] = useState(false)
+  const dispatch = useDispatch()
   const activeChannelRef = useRef(null)
+  const { isModalOpen } = useSelector((state) => state.modal)
 
   useEffect(() => {
     if (activeChannelRef.current) {
       activeChannelRef.current.scrollIntoView({ behavior: 'smooth' })
     }
   }, [activeChannel])
+
+  const handleAddChannel = () => {
+    dispatch(openModal({ type: 'addChannel' }))
+  }
 
   return (
     <>
@@ -25,7 +32,7 @@ const ChannelList = ({ channels, activeChannel, onChannelClick }) => {
             <Button
               variant="outline-primary"
               size="sm"
-              onClick={() => setShowModal(true)}
+              onClick={handleAddChannel}
             >
               +
             </Button>
@@ -61,11 +68,7 @@ const ChannelList = ({ channels, activeChannel, onChannelClick }) => {
       ) : (
         <p>{t('no_channels')}</p>
       )}
-      <ModalNewChat
-        showModal={showModal}
-        setShowModal={setShowModal}
-        channels={channels}
-      />
+      <ModalNewChat showModal={isModalOpen} />
     </>
   )
 }
