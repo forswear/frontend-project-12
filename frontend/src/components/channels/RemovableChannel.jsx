@@ -1,3 +1,4 @@
+// src/components/channels/RemovableChannel.jsx
 import { Button, Dropdown } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
@@ -5,6 +6,7 @@ import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
 import { initializeSocket } from '../../socket'
 import { API_BASE_URL } from '../../api'
+import { channelNameValidationSchema } from '../../utils/yupSchemas'
 
 const RemovableChannel = ({ channel, isActive, onClick }) => {
   const { t } = useTranslation()
@@ -13,27 +15,35 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
   const socket = initializeSocket()
 
   const handleRenameChannel = () => {
-    const newName = prompt(t('new_channel_name'))
-    if (newName && newName.trim().length >= 3 && newName.trim().length <= 20) {
-      const channelId = channel.id
-      const authHeader = { headers: { Authorization: `Bearer ${localToken}` } }
-      axios
-        .put(
-          `${API_BASE_URL}channels/${channelId}`,
-          { name: newName },
-          authHeader
-        )
-        .then(() => {
-          dispatch({
-            type: 'channels/renameChannel',
-            payload: { id: channel.id, name: newName },
+    let newName = prompt(t('new_channel_name'))
+    if (newName) {
+      try {
+        newName = channelNameValidationSchema.validateSync(newName)
+
+        const channelId = channel.id
+        const authHeader = {
+          headers: { Authorization: `Bearer ${localToken}` },
+        }
+        axios
+          .put(
+            `${API_BASE_URL}channels/${channelId}`,
+            { name: newName },
+            authHeader
+          )
+          .then(() => {
+            dispatch({
+              type: 'channels/renameChannel',
+              payload: { id: channel.id, name: newName },
+            })
+            toast.success(t('channel_renamed_successfully'))
           })
-          toast.success(t('channel_renamed_successfully'))
-        })
-        .catch((err) => {
-          console.error(err)
-          toast.error(t('error_renaming_channel'))
-        })
+          .catch((err) => {
+            console.error(err)
+            toast.error(t('error_renaming_channel'))
+          })
+      } catch (validationError) {
+        alert(`Неверное имя канала: ${validationError.message}`)
+      }
     }
   }
 
