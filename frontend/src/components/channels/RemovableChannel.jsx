@@ -6,7 +6,9 @@ import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
 import { initializeSocket } from '../../socket'
 import { API_BASE_URL } from '../../api'
-import { channelNameValidationSchema } from '../../utils/yupSchemas'
+import EditChannelModal from '../../modals/EditChannelModal'
+import RemoveChannelModal from '../../modals/RemoveChannelModal'
+import React, { useState } from 'react'
 
 const RemovableChannel = ({ channel, isActive, onClick }) => {
   const { t } = useTranslation()
@@ -14,91 +16,104 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
   const localToken = useSelector((state) => state.auth.user.token)
   const socket = initializeSocket()
 
-  const handleRenameChannel = () => {
-    let newName = prompt(t('new_channel_name'))
-    if (newName) {
-      try {
-        newName = channelNameValidationSchema.validateSync(newName)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [showRemoveModal, setShowRemoveModal] = useState(false)
 
-        const channelId = channel.id
-        const authHeader = {
-          headers: { Authorization: `Bearer ${localToken}` },
-        }
-        axios
-          .put(
-            `${API_BASE_URL}channels/${channelId}`,
-            { name: newName },
-            authHeader
-          )
-          .then(() => {
-            dispatch({
-              type: 'channels/renameChannel',
-              payload: { id: channel.id, name: newName },
-            })
-            toast.success(t('channel_renamed_successfully'))
-          })
-          .catch((err) => {
-            console.error(err)
-            toast.error(t('error_renaming_channel'))
-          })
-      } catch (validationError) {
-        alert(`Неверное имя канала: ${validationError.message}`)
-      }
-    }
+  const handleRenameChannel = () => {
+    setShowEditModal(true)
   }
 
   const handleDeleteChannel = () => {
-    if (window.confirm(t('delete_confirmation'))) {
-      axios
-        .delete(`${API_BASE_URL}channels/${channel.id}`, {
-          headers: { Authorization: `Bearer ${localToken}` },
+    setShowRemoveModal(true)
+  }
+
+  const saveEditedChannel = (newName) => {
+    const channelId = channel.id
+    const authHeader = { headers: { Authorization: `Bearer ${localToken}` } }
+    axios
+      .put(
+        `${API_BASE_URL}channels/${channelId}`,
+        { name: newName },
+        authHeader
+      )
+      .then(() => {
+        dispatch({
+          type: 'channels/renameChannel',
+          payload: { id: channel.id, name: newName },
         })
-        .then(() => {
-          dispatch({
-            type: 'channels/removeChannel',
-            payload: { id: channel.id },
-          })
-          socket.emit('removeChannel', { channelId: channel.id })
-          toast.success(t('channel_deleted_successfully'))
+        toast.success(t('channel_renamed_successfully'))
+      })
+      .catch((err) => {
+        console.error(err)
+        toast.error(t('error_renaming_channel'))
+      })
+  }
+
+  const confirmRemoveChannel = () => {
+    const channelId = channel.id
+    const authHeader = { headers: { Authorization: `Bearer ${localToken}` } }
+    axios
+      .delete(`${API_BASE_URL}channels/${channelId}`, authHeader)
+      .then(() => {
+        dispatch({
+          type: 'channels/removeChannel',
+          payload: { id: channel.id },
         })
-        .catch((err) => {
-          console.error(err)
-          toast.error(t('error_deleting_channel'))
-        })
-    }
+        socket.emit('removeChannel', { channelId })
+        toast.success(t('channel_deleted_successfully'))
+      })
+      .catch((err) => {
+        console.error(err)
+        toast.error(t('error_deleting_channel'))
+      })
   }
 
   return (
-    <div className="d-flex">
-      <Button
-        variant={isActive ? 'primary' : 'light'}
-        onClick={onClick}
-        className={`text-start flex-grow-1 rounded-0 border-end-0 ${
-          isActive ? 'text-white' : ''
-        }`}
-        style={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        #{channel.name}
-      </Button>
-      <Dropdown align="end" drop="down" className="rounded-0">
-        <Dropdown.Toggle
+    <>
+      <div className="d-flex">
+        <Button
           variant={isActive ? 'primary' : 'light'}
-          className={`rounded-0 border-start-0 ${isActive ? 'text-white' : ''}`}
-        />
-        <Dropdown.Menu>
-          <Dropdown.Item onClick={handleRenameChannel}>
-            {t('rename_channel')}
-          </Dropdown.Item>
-          <Dropdown.Item onClick={handleDeleteChannel}>
-            {t('delete_channel')}
-          </Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>
-    </div>
+          onClick={onClick}
+          className={`text-start flex-grow-1 rounded-0 border-end-0 ${
+            isActive ? 'text-white' : ''
+          }`}
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          #{channel.name}
+        </Button>
+        <Dropdown align="end" drop="down" className="rounded-0">
+          <Dropdown.Toggle
+            variant={isActive ? 'primary' : 'light'}
+            className={`rounded-0 border-start-0 ${
+              isActive ? 'text-white' : ''
+            }`}
+          />
+          <Dropdown.Menu>
+            <Dropdown.Item onClick={handleRenameChannel}>
+              {t('rename_channel')}
+            </Dropdown.Item>
+            <Dropdown.Item onClick={handleDeleteChannel}>
+              {t('delete_channel')}
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </div>
+      <EditChannelModal
+        show={showEditModal}
+        onHide={() => setShowEditModal(false)}
+        channel={channel}
+        onSave={saveEditedChannel}
+      />
+      <RemoveChannelModal
+        show={showRemoveModal}
+        onHide={() => setShowRemoveModal(false)}
+        onConfirm={confirmRemoveChannel}
+      />
+    </>
   )
 }
 
