@@ -2,20 +2,19 @@ import { Card } from 'react-bootstrap'
 import { useSelector } from 'react-redux'
 import { useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
-import { initializeSocket } from '../socket' // Используем именованный экспорт
+import { initializeSocket } from '../socket'
 import MessageForm from './MessageForm.jsx'
 import { addNewMessage, getMessages } from '../slices/messagesSlice.js'
 import { useTranslation } from 'react-i18next'
+import { selectMessagesByChannelId } from '../selectors'
 
 const ChatWindow = ({ localToken, activeChannel }) => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
-  const messages = useSelector((state) => state.messages.messages)
   const messagesEndRef = useRef(null)
 
-  const currentChannelId = activeChannel?.id
-  const filteredMessages = messages.filter(
-    (message) => message.channelId === currentChannelId
+  const filteredMessages = useSelector((state) =>
+    selectMessagesByChannelId(state, activeChannel?.id)
   )
 
   useEffect(() => {
@@ -28,7 +27,7 @@ const ChatWindow = ({ localToken, activeChannel }) => {
     }
   }, [dispatch, localToken, activeChannel?.id])
 
-  const socket = initializeSocket() // Инициализируем WebSocket при необходимости
+  const socket = initializeSocket()
 
   useEffect(() => {
     const handleNewMessage = (payload) => {
