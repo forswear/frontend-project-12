@@ -7,7 +7,7 @@ import { addNewChannel, addChannels } from '../slices/channelsSlice.js'
 import Header from './Header.jsx'
 import ChannelsList from './ChannelsList.jsx'
 import ChatWindow from './ChatWindow.jsx'
-import { initializeSocket } from '../socket' // Используем именованный экспорт
+import { initializeSocket } from '../socket'
 
 const getChannels = async (userToken) => {
   try {
@@ -24,17 +24,18 @@ const getChannels = async (userToken) => {
 const HomePage = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const localToken = localStorage.getItem('token')
+  const token = useSelector((state) => state.auth.user.token)
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
   const channels = useSelector((state) => state.channels.channels)
   const [activeChannel, setActiveChannel] = useState(null)
 
   useEffect(() => {
-    if (!localToken) {
+    if (!isAuthenticated) {
       navigate('/login')
     } else {
       const fetchChannels = async () => {
         try {
-          const channelsData = await getChannels(localToken)
+          const channelsData = await getChannels(token)
           const firstChannel = channelsData[0]
           dispatch(addChannels(channelsData))
           setActiveChannel(firstChannel)
@@ -44,9 +45,9 @@ const HomePage = () => {
       }
       fetchChannels()
     }
-  }, [localToken, navigate, dispatch])
+  }, [token, isAuthenticated, navigate, dispatch])
 
-  const socket = initializeSocket() // Инициализируем WebSocket при необходимости
+  const socket = initializeSocket()
 
   useEffect(() => {
     socket.on('newChannel', (payload) => {
@@ -74,7 +75,7 @@ const HomePage = () => {
           />
         </Col>
         <Col md={9} className="d-flex flex-column p-0">
-          <ChatWindow activeChannel={activeChannel} localToken={localToken} />
+          <ChatWindow activeChannel={activeChannel} />
         </Col>
       </Row>
     </Container>

@@ -1,6 +1,6 @@
 import { Form, Button } from 'react-bootstrap'
 import { useFormik } from 'formik'
-import { initializeSocket } from '../socket' // Используем именованный экспорт
+import { initializeSocket } from '../socket'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -11,7 +11,7 @@ const MessageForm = ({ activeChannel }) => {
   const token = useSelector((state) => state.auth.user.token)
   const username = useSelector((state) => state.auth.user.username)
 
-  const socket = initializeSocket() // Инициализируем WebSocket через функцию
+  const socket = initializeSocket()
 
   const formik = useFormik({
     initialValues: { message: '' },
@@ -23,9 +23,11 @@ const MessageForm = ({ activeChannel }) => {
         const messageData = {
           body: filteredMessage,
           channelId: activeChannel.id,
-          username: username,
+          username,
         }
+
         const authHeader = { headers: { Authorization: `Bearer ${token}` } }
+
         const response = await axios.post(
           '/api/v1/messages',
           messageData,
@@ -33,11 +35,10 @@ const MessageForm = ({ activeChannel }) => {
         )
 
         socket.emit('send_message', {
-          body: filteredMessage,
-          channelId: activeChannel.id,
-          username: username,
+          ...messageData,
           id: response.data.id,
         })
+
         resetForm()
       } catch (error) {
         console.error('Ошибка при отправке сообщения:', error)

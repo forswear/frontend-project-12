@@ -1,16 +1,16 @@
 import { Card } from 'react-bootstrap'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { useEffect, useRef } from 'react'
-import { useDispatch } from 'react-redux'
 import { initializeSocket } from '../socket'
 import MessageForm from './MessageForm.jsx'
 import { addNewMessage, getMessages } from '../slices/messagesSlice.js'
 import { useTranslation } from 'react-i18next'
 import { selectMessagesByChannelId } from '../selectors'
 
-const ChatWindow = ({ localToken, activeChannel }) => {
+const ChatWindow = ({ activeChannel }) => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
+  const token = useSelector((state) => state.auth.user.token)
   const messagesEndRef = useRef(null)
 
   const filteredMessages = useSelector((state) =>
@@ -22,24 +22,17 @@ const ChatWindow = ({ localToken, activeChannel }) => {
   }, [filteredMessages])
 
   useEffect(() => {
-    if (localToken) {
-      dispatch(getMessages(localToken))
+    if (token) {
+      dispatch(getMessages(token))
     }
-  }, [dispatch, localToken, activeChannel?.id])
+  }, [dispatch, token, activeChannel?.id])
 
   const socket = initializeSocket()
 
   useEffect(() => {
     const handleNewMessage = (payload) => {
-      if (payload && payload.body && payload.channelId && payload.username) {
-        dispatch(
-          addNewMessage({
-            id: payload.id,
-            body: payload.body,
-            channelId: payload.channelId,
-            username: payload.username,
-          })
-        )
+      if (payload?.body && payload?.channelId && payload?.username) {
+        dispatch(addNewMessage(payload))
       }
     }
     socket.on('newMessage', handleNewMessage)
