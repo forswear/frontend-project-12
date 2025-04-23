@@ -1,4 +1,3 @@
-// src/components/HomePage.jsx
 import { Container, Row, Col } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
@@ -6,15 +5,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import { addChannels } from '../slices/channelsSlice.js'
 import Header from './Header.jsx'
-import ChannelsList from './ChannelsList.jsx'
+import ChannelList from './ChannelsList.jsx'
 import ChatWindow from './ChatWindow.jsx'
-
-const getChannels = async (userToken) => {
-  const response = await axios.get('/api/v1/channels', {
-    headers: { Authorization: `Bearer ${userToken}` },
-  })
-  return response.data
-}
 
 const HomePage = () => {
   const dispatch = useDispatch()
@@ -32,9 +24,11 @@ const HomePage = () => {
 
     const fetchChannels = async () => {
       try {
-        const channelsData = await getChannels(token)
-        dispatch(addChannels(channelsData))
-        setActiveChannel(channelsData[0])
+        const response = await axios.get('/api/v1/channels', {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        dispatch(addChannels(response.data))
+        setActiveChannel(response.data[0])
       } catch (error) {
         console.error(error)
       }
@@ -52,7 +46,7 @@ const HomePage = () => {
       <Header />
       <Row className="flex-grow-1">
         <Col md={3} className="bg-light p-3 border-end">
-          <ChannelsList
+          <ChannelList
             channels={channels}
             activeChannel={activeChannel}
             onChannelClick={setActiveChannel}

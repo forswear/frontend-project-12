@@ -27,7 +27,7 @@ const ChannelList = ({ channels, activeChannel, onChannelClick }) => {
     <>
       {activeChannel && channels.length ? (
         <div className="d-flex flex-column p-0" style={{ height: '91vh' }}>
-          <div className="d-flex justify-content-between align-items-center mb-3">
+          <div className="d-flex justify-content-between align-items-center mb-3 px-3">
             <h4 className="mb-0">{t('channels')}</h4>
             <Button
               variant="outline-primary"
@@ -66,7 +66,7 @@ const ChannelList = ({ channels, activeChannel, onChannelClick }) => {
           </ListGroup>
         </div>
       ) : (
-        <p>{t('no_channels')}</p>
+        <p className="text-center py-5">{t('no_channels')}</p>
       )}
       <ModalNewChat showModal={isModalOpen} />
     </>

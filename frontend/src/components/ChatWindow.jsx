@@ -12,7 +12,6 @@ const ChatWindow = ({ activeChannel }) => {
   const dispatch = useDispatch()
   const token = useSelector((state) => state.auth.user.token)
   const messagesEndRef = useRef(null)
-
   const filteredMessages = useSelector((state) =>
     selectMessagesByChannelId(state, activeChannel?.id)
   )
@@ -28,7 +27,6 @@ const ChatWindow = ({ activeChannel }) => {
   }, [dispatch, token, activeChannel?.id])
 
   const socket = initializeSocket()
-
   useEffect(() => {
     const handleNewMessage = (payload) => {
       if (payload?.body && payload?.channelId && payload?.username) {
