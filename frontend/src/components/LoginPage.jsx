@@ -47,11 +47,11 @@ const LoginPage = () => {
           <h1 className="text-center mb-4">{t('login_title')}</h1>
           <Form onSubmit={formik.handleSubmit}>
             <Form.Group className="mb-3" controlId="username">
-              <Form.Label>{t('username')}</Form.Label>
+              <Form.Label>{t('login_username')}</Form.Label>
               <Form.Control
                 type="text"
                 name="username"
-                placeholder={t('username')}
+                placeholder={t('login_username')}
                 onChange={formik.handleChange}
                 value={formik.values.username}
                 isInvalid={!!formik.errors.username}
