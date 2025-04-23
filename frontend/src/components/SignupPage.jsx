@@ -1,16 +1,20 @@
 import { Form, Button, Container, Alert } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
 import axios from 'axios'
 import { useTranslation } from 'react-i18next'
 import { API_BASE_URL } from '../api'
 import { Navbar } from 'react-bootstrap'
+import { useDispatch } from 'react-redux'
+import { userLogIn } from '../slices/authSlice.js'
 import React from 'react'
 
 const SignupPage = () => {
   const { t } = useTranslation()
   const [error, setError] = React.useState(null)
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const validationSchema = yup.object({
     username: yup
@@ -38,12 +42,15 @@ const SignupPage = () => {
     onSubmit: async (values) => {
       setError(null)
       try {
-        await axios.post(`${API_BASE_URL}signup`, {
+        const response = await axios.post(`${API_BASE_URL}signup`, {
           username: values.username,
           password: values.password,
         })
-        // После успешной регистрации можно перенаправить на страницу входа
-        window.location.href = '/login'
+
+        const { token, username } = response.data
+        dispatch(userLogIn({ username, token }))
+
+        navigate('/')
       } catch (_error) {
         setError(t('user_already_exists'))
       }
