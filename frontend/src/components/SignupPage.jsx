@@ -45,7 +45,7 @@ const SignupPage = () => {
         const { username, token } = response.data
         dispatch(userLogIn({ username, token }))
         navigate('/')
-      } catch (error) {
+      } catch (_error) {
         setError(t('user_already_exists'))
       }
     },
