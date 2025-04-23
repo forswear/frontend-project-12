@@ -24,7 +24,7 @@ const resources = {
       login_link: 'Вход',
       channels: 'Каналы',
       send: 'Отправить',
-      message_placeholder: 'Сообщение...',
+      message_placeholder: 'Введите сообщение...',
       add_channel: 'Добавить канал',
       channel_name: 'Имя канала',
       cancel: 'Отменить',
