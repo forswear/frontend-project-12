@@ -14,7 +14,6 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
   const dispatch = useDispatch()
   const localToken = useSelector((state) => state.auth.user.token)
   const socket = initializeSocket()
-
   const [showEditModal, setShowEditModal] = useState(false)
   const [showRemoveModal, setShowRemoveModal] = useState(false)
 

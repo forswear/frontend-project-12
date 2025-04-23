@@ -23,11 +23,8 @@ const MessageForm = ({ activeChannel }) => {
           channelId: activeChannel.id,
           username,
         }
-
         const authHeader = { headers: { Authorization: `Bearer ${token}` } }
-
         await axios.post(`${API_BASE_URL}messages`, messageData, authHeader)
-
         resetForm()
       } catch (error) {
         console.error('Ошибка при отправке сообщения:', error)
@@ -47,12 +44,6 @@ const MessageForm = ({ activeChannel }) => {
           name="message"
           value={formik.values.message}
           onChange={formik.handleChange}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault()
-              formik.handleSubmit()
-            }
-          }}
           required
         />
         <Button

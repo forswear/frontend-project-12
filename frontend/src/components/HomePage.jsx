@@ -1,16 +1,21 @@
 import { Container, Row, Col } from 'react-bootstrap'
-import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
-import { addChannels } from '../slices/channelsSlice.js'
 import Header from './Header.jsx'
-import ChannelList from './ChannelsList.jsx'
+import ChannelsList from './ChannelsList.jsx'
 import ChatWindow from './ChatWindow.jsx'
+import { addChannels } from '../slices/channelsSlice.js'
+
+const getChannels = async (userToken) => {
+  const response = await axios.get('/api/v1/channels', {
+    headers: { Authorization: `Bearer ${userToken}` },
+  })
+  return response.data
+}
 
 const HomePage = () => {
   const dispatch = useDispatch()
-  const navigate = useNavigate()
   const token = useSelector((state) => state.auth.user.token)
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
   const channels = useSelector((state) => state.channels.channels)
@@ -18,24 +23,22 @@ const HomePage = () => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/login')
+      window.location.href = '/login'
       return
     }
 
     const fetchChannels = async () => {
       try {
-        const response = await axios.get('/api/v1/channels', {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        dispatch(addChannels(response.data))
-        setActiveChannel(response.data[0])
+        const channelsData = await getChannels(token)
+        dispatch(addChannels(channelsData))
+        setActiveChannel(channelsData[0])
       } catch (error) {
         console.error(error)
       }
     }
 
     fetchChannels()
-  }, [dispatch, isAuthenticated, navigate, token])
+  }, [dispatch, isAuthenticated, token])
 
   return (
     <Container
@@ -46,7 +49,7 @@ const HomePage = () => {
       <Header />
       <Row className="flex-grow-1">
         <Col md={3} className="bg-light p-3 border-end">
-          <ChannelList
+          <ChannelsList
             channels={channels}
             activeChannel={activeChannel}
             onChannelClick={setActiveChannel}

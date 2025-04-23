@@ -1,11 +1,10 @@
-import { Card } from 'react-bootstrap'
 import { useSelector, useDispatch } from 'react-redux'
 import { useEffect, useRef } from 'react'
-import { initializeSocket } from '../socket'
-import MessageForm from './MessageForm.jsx'
-import { addNewMessage, getMessages } from '../slices/messagesSlice.js'
-import { useTranslation } from 'react-i18next'
+import MessageForm from './MessageForm'
 import { selectMessagesByChannelId } from '../selectors'
+import { initializeSocket } from '../socket'
+import { addNewMessage } from '../slices/messagesSlice'
+import { useTranslation } from 'react-i18next'
 
 const ChatWindow = ({ activeChannel }) => {
   const { t } = useTranslation()
@@ -22,27 +21,20 @@ const ChatWindow = ({ activeChannel }) => {
 
   useEffect(() => {
     if (token) {
-      dispatch(getMessages(token))
-    }
-  }, [dispatch, token, activeChannel?.id])
-
-  useEffect(() => {
-    const socket = initializeSocket(token)
-
-    const handleNewMessage = (payload) => {
-      if (
-        payload?.body &&
-        payload?.channelId === activeChannel?.id &&
-        payload?.username
-      ) {
-        dispatch(addNewMessage(payload))
+      const socket = initializeSocket(token)
+      const handleNewMessage = (payload) => {
+        if (
+          payload?.body &&
+          payload?.channelId === activeChannel?.id &&
+          payload?.username
+        ) {
+          dispatch(addNewMessage(payload))
+        }
       }
-    }
-
-    socket.on('newMessage', handleNewMessage)
-
-    return () => {
-      socket.off('newMessage', handleNewMessage)
+      socket.on('newMessage', handleNewMessage)
+      return () => {
+        socket.off('newMessage', handleNewMessage)
+      }
     }
   }, [dispatch, token, activeChannel?.id])
 
@@ -52,26 +44,20 @@ const ChatWindow = ({ activeChannel }) => {
 
   return (
     <div className="d-flex flex-column h-100">
-      <div className="bg-light border-bottom p-3">
-        <h5 className="mb-0">{`# ${activeChannel.name}`}</h5>
+      <div className="bg-light mb-4 p-3 shadow-sm small">
+        <p className="m-0">
+          <b>#{activeChannel.name}</b>
+        </p>
+        <span className="text-muted">{`${filteredMessages.length} сообщений`}</span>
       </div>
-      <Card className="flex-grow-1 rounded-0 border-0">
-        <Card.Body
-          className="overflow-auto p-3"
-          style={{ maxHeight: 'calc(100vh - 180px)' }}
-        >
-          {filteredMessages.map((message) => (
-            <div
-              key={message.id}
-              className="mb-2"
-              style={{ wordWrap: 'break-word' }}
-            >
-              <strong>{message.username}:</strong> {message.body}
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </Card.Body>
-      </Card>
+      <div id="messages-box" className="chat-messages overflow-auto px-5">
+        {filteredMessages.map((message) => (
+          <div key={message.id} className="mb-2">
+            <strong>{message.username}:</strong> {message.body}
+          </div>
+        ))}
+        <div ref={messagesEndRef} />
+      </div>
       <MessageForm activeChannel={activeChannel} />
     </div>
   )

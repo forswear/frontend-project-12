@@ -25,9 +25,9 @@ const ChannelList = ({ channels, activeChannel, onChannelClick }) => {
 
   return (
     <>
-      {activeChannel && channels.length ? (
+      {channels.length ? (
         <div className="d-flex flex-column p-0" style={{ height: '91vh' }}>
-          <div className="d-flex justify-content-between align-items-center mb-3 px-3">
+          <div className="d-flex justify-content-between align-items-center mb-3">
             <h4 className="mb-0">{t('channels')}</h4>
             <Button
               variant="outline-primary"
@@ -43,21 +43,21 @@ const ChannelList = ({ channels, activeChannel, onChannelClick }) => {
             {channels.map((channel) => (
               <ListGroup.Item
                 key={channel.id}
-                ref={activeChannel.id === channel.id ? activeChannelRef : null}
-                active={channel.id === activeChannel.id}
+                ref={activeChannel?.id === channel.id ? activeChannelRef : null}
+                active={channel.id === activeChannel?.id}
                 className="p-0 border-0"
                 action
               >
                 {channel.removable ? (
                   <RemovableChannel
                     channel={channel}
-                    isActive={channel.id === activeChannel.id}
+                    isActive={channel.id === activeChannel?.id}
                     onClick={() => onChannelClick(channel)}
                   />
                 ) : (
                   <UnremovableChannel
                     channel={channel}
-                    isActive={channel.id === activeChannel.id}
+                    isActive={channel.id === activeChannel?.id}
                     onClick={() => onChannelClick(channel)}
                   />
                 )}
@@ -66,7 +66,7 @@ const ChannelList = ({ channels, activeChannel, onChannelClick }) => {
           </ListGroup>
         </div>
       ) : (
-        <p className="text-center py-5">{t('no_channels')}</p>
+        <p>{t('no_channels')}</p>
       )}
       <ModalNewChat showModal={isModalOpen} />
     </>

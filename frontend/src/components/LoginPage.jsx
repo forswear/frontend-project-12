@@ -1,4 +1,3 @@
-import { useFormik } from 'formik'
 import { Form, Button, Container, Alert, Navbar } from 'react-bootstrap'
 import { useNavigate, Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
@@ -7,6 +6,7 @@ import { userLogIn } from '../slices/authSlice.js'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { API_BASE_URL } from '../api'
+import { useFormik } from 'formik'
 
 const LoginPage = () => {
   const { t } = useTranslation()
@@ -23,7 +23,11 @@ const LoginPage = () => {
         const { token, username } = response.data
         dispatch(userLogIn({ username, token }))
         navigate('/')
-      } catch (_error) {
+      } catch (error) {
+        console.error(
+          'Ошибка при входе:',
+          error.response?.data || error.message
+        )
         setError(t('user_already_exists'))
       }
     },
@@ -38,7 +42,6 @@ const LoginPage = () => {
           </Navbar.Brand>
         </Container>
       </Navbar>
-
       <Container
         className="d-flex flex-column justify-content-center align-items-center"
         style={{ flex: 1 }}

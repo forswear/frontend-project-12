@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import LoginPage from './LoginPage.jsx'
-import HomePage from './HomePage.jsx'
-import NotFoundPage from './NotFoundPage.jsx'
-import SignupPage from './SignupPage.jsx'
+import LoginPage from './LoginPage'
+import HomePage from './HomePage'
+import NotFoundPage from './NotFoundPage'
+import SignupPage from './SignupPage'
 import { PATHS } from '../routes'
 import { useSelector } from 'react-redux'
 
