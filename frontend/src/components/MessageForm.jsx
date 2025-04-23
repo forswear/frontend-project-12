@@ -32,6 +32,13 @@ const MessageForm = ({ activeChannel }) => {
     },
   })
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      formik.handleSubmit()
+    }
+  }
+
   return (
     <Form className="p-3 border-top" onSubmit={formik.handleSubmit}>
       <Form.Group className="d-flex">
@@ -44,6 +51,7 @@ const MessageForm = ({ activeChannel }) => {
           name="message"
           value={formik.values.message}
           onChange={formik.handleChange}
+          onKeyDown={handleKeyDown}
           required
         />
         <Button
