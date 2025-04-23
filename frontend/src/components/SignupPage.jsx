@@ -41,15 +41,16 @@ const SignupPage = () => {
           username: values.username,
           password: values.password,
         })
+
         const { username, token } = response.data
         dispatch(userLogIn({ username, token }))
         navigate('/')
       } catch (error) {
-        console.error(
-          'Ошибка при регистрации:',
-          error.response?.data || error.message
-        )
-        setError(error.response?.data?.message || t('user_already_exists'))
+        if (error.response?.status === 409) {
+          setError(t('user_already_exists2'))
+        } else {
+          setError(t('registration_error'))
+        }
       }
     },
   })

@@ -22,6 +22,8 @@ const resources = {
       have_account: 'Есть аккаунт?',
       registration_link: 'Регистрация',
       login_link: 'Вход',
+      user_already_exists2: 'Такой пользователь уже существует',
+      registration_error: 'Произошла ошибка при регистрации',
       channels: 'Каналы',
       send: 'Отправить',
       message_placeholder: 'Введите сообщение...',
