@@ -51,8 +51,12 @@ const SignupPage = () => {
         dispatch(userLogIn({ username, token }))
 
         navigate('/')
-      } catch (_error) {
-        setError(t('user_already_exists'))
+      } catch (error) {
+        if (error.response && error.response.status === 409) {
+          setError('Такой пользователь уже существует')
+        } else {
+          setError('Произошла ошибка при регистрации')
+        }
       }
     },
   })
@@ -73,6 +77,7 @@ const SignupPage = () => {
       >
         <div className="w-100" style={{ maxWidth: '400px' }}>
           <h1 className="text-center mb-4">{t('signup_title')}</h1>
+
           <Form onSubmit={formik.handleSubmit}>
             <Form.Group className="mb-3" controlId="username">
               <Form.Label>{t('signup_username')}</Form.Label>
