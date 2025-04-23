@@ -11,7 +11,7 @@ const resources = {
       password_mismatch: 'Пароли должны совпадать',
       user_already_exists: 'Неверные имя пользователя или пароль',
       signup_title: 'Регистрация',
-      login_title: 'Вход',
+      login_title: 'Войти',
       username: 'Ваш ник',
       password: 'Пароль',
       confirm_password: 'Подтвердите пароль',
