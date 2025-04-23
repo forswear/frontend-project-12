@@ -26,18 +26,25 @@ const ChatWindow = ({ activeChannel }) => {
     }
   }, [dispatch, token, activeChannel?.id])
 
-  const socket = initializeSocket()
   useEffect(() => {
+    const socket = initializeSocket(token)
+
     const handleNewMessage = (payload) => {
-      if (payload?.body && payload?.channelId && payload?.username) {
+      if (
+        payload?.body &&
+        payload?.channelId === activeChannel?.id &&
+        payload?.username
+      ) {
         dispatch(addNewMessage(payload))
       }
     }
+
     socket.on('newMessage', handleNewMessage)
+
     return () => {
       socket.off('newMessage', handleNewMessage)
     }
-  }, [dispatch, socket])
+  }, [dispatch, token, activeChannel?.id])
 
   if (!activeChannel) {
     return <div className="p-3">{t('select_channel')}</div>
