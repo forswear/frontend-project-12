@@ -1,5 +1,6 @@
 install:
-		npm ci --prefix frontend
+    npm ci
+    npm ci --prefix frontend
 
 preinstall:
 		npm ci
