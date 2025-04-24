@@ -34,8 +34,8 @@ const resources = {
       select_channel: 'Выберите канал',
       no_messages: 'Нет сообщений',
       edit_channel: 'Переименовать канал',
-      rename_channel: 'Переименовать канал',
-      delete_channel: 'Удалить канал',
+      rename_channel: 'Переименовать',
+      delete_channel: 'Удалить',
       delete_confirmation:
         'Вы уверены, что хотите удалить этот канал? Все сообщения будут удалены.',
       new_channel_name: 'Введите новое имя канала:',

@@ -20,13 +20,11 @@ const EditChannelModal = ({ show, onHide, channel, onSave }) => {
       const validatedName = channelNameValidationSchema.validateSync(newName)
       const filteredName = leoProfanity.clean(validatedName)
       const authHeader = { headers: { Authorization: `Bearer ${token}` } }
-
       await axios.put(
         `${API_BASE_URL}channels/${channel.id}`,
         { name: filteredName },
         authHeader
       )
-
       onSave(filteredName)
       toast.success(t('channel_renamed'))
       onHide()

@@ -17,7 +17,6 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
   const socket = initializeSocket()
   const [showEditModal, setShowEditModal] = useState(false)
   const [showRemoveModal, setShowRemoveModal] = useState(false)
-
   const displayName = leoProfanity.clean(channel.name)
 
   const handleRenameChannel = () => {
@@ -35,6 +34,16 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
         type: 'channels/renameChannel',
         payload: { id: channel.id, name: filteredName },
       })
+
+      const authHeader = { headers: { Authorization: `Bearer ${localToken}` } }
+      await axios.put(
+        `${API_BASE_URL}channels/${channel.id}`,
+        { name: filteredName },
+        authHeader
+      )
+
+      toast.success(t('channel_renamed'))
+      setShowEditModal(false) // Закрываем модальное окно
     } catch (err) {
       console.error(err)
       toast.error(t('error_renaming_channel'))
@@ -44,7 +53,6 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
   const confirmRemoveChannel = async () => {
     const channelId = channel.id
     const authHeader = { headers: { Authorization: `Bearer ${localToken}` } }
-
     try {
       await axios.delete(`${API_BASE_URL}channels/${channelId}`, authHeader)
       dispatch({
@@ -83,26 +91,26 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
             }`}
           />
           <Dropdown.Menu>
-            <Dropdown.Item onClick={handleRenameChannel}>
-              {t('rename_channel')}
-            </Dropdown.Item>
             <Dropdown.Item onClick={handleDeleteChannel}>
               {t('delete_channel')}
+            </Dropdown.Item>
+            <Dropdown.Item onClick={handleRenameChannel}>
+              {t('rename_channel')}
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
       </div>
-      <EditChannelModal
-        show={showEditModal}
-        onHide={() => setShowEditModal(false)}
-        channel={{ ...channel, name: displayName }}
-        onSave={saveEditedChannel}
-      />
       <RemoveChannelModal
         show={showRemoveModal}
         onHide={() => setShowRemoveModal(false)}
         onConfirm={confirmRemoveChannel}
         channelId={channel.id}
+      />
+      <EditChannelModal
+        show={showEditModal}
+        onHide={() => setShowEditModal(false)}
+        channel={{ ...channel, name: displayName }}
+        onSave={saveEditedChannel}
       />
     </>
   )
