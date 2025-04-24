@@ -16,7 +16,9 @@ export default [
       },
       parserOptions: {
         ecmaVersion: 'latest',
-        ecmaFeatures: { jsx: true },
+        ecmaFeatures: {
+          jsx: true,
+        },
         sourceType: 'module',
       },
     },
@@ -44,6 +46,8 @@ export default [
         },
       ],
       'react/react-in-jsx-scope': 'off',
+      'react/jsx-uses-react': 'error',
+      'react/jsx-uses-vars': 'error',
       'react/prop-types': 'off',
       'react-refresh/only-export-components': [
         'warn',
