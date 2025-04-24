@@ -59,13 +59,9 @@ const ChatWindow = ({ activeChannel }) => {
         <p className="m-0">
           <b>#{activeChannel.name}</b>
         </p>
-        <span className="text-muted">{`${filteredMessages.length} ${t(
-          'messages',
-          { count: filteredMessages.length }
-        )}`}</span>
+        <span className="text-muted">{`${filteredMessages.length} сообщений`}</span>
       </div>
       <div
-        id={`chat-${activeChannel.id}`}
         className="chat-messages overflow-auto px-5 flex-grow-1"
         style={{ maxHeight: 'calc(100vh - 200px)' }}
       >

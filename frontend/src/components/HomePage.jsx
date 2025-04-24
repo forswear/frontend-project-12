@@ -8,6 +8,7 @@ import ChatWindow from './ChatWindow'
 import { addChannels } from '../slices/channelsSlice'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
+import ModalNewChat from './ModalNewChat'
 
 const getChannels = async (userToken) => {
   const response = await axios.get('/api/v1/channels', {
@@ -50,6 +51,10 @@ const HomePage = () => {
     fetchChannels()
   }, [dispatch, isAuthenticated, token, t])
 
+  const handleChannelCreated = (newChannel) => {
+    setActiveChannel(newChannel)
+  }
+
   return (
     <Container fluid className="vh-100 d-flex flex-column p-0 overflow-hidden">
       <Header />
@@ -65,6 +70,7 @@ const HomePage = () => {
           <ChatWindow activeChannel={activeChannel} />
         </Col>
       </Row>
+      <ModalNewChat onChannelCreated={handleChannelCreated} />
     </Container>
   )
 }
