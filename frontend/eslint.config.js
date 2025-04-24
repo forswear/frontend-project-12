@@ -9,13 +9,12 @@ export default [
   {
     files: ['**/*.{js,jsx}'],
     languageOptions: {
-      ecmaVersion: 2020,
+      ecmaVersion: 'latest',
       globals: {
         ...globals.browser,
-        ...globals.es2020,
+        ...globals.es2021,
       },
       parserOptions: {
-        ecmaVersion: 'latest',
         ecmaFeatures: {
           jsx: true,
         },
@@ -34,7 +33,7 @@ export default [
     },
     rules: {
       ...js.configs.recommended.rules,
-      ...react.configs.recommended.rules,
+      ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
       'no-unused-vars': [
         'error',
@@ -46,13 +45,13 @@ export default [
         },
       ],
       'react/react-in-jsx-scope': 'off',
-      'react/jsx-uses-react': 'error',
-      'react/jsx-uses-vars': 'error',
       'react/prop-types': 'off',
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
       ],
+      'react/jsx-uses-react': 'error',
+      'react/jsx-uses-vars': 'error',
     },
   },
 ]

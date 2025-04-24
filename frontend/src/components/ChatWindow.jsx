@@ -1,4 +1,3 @@
-import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useEffect, useRef, useState } from 'react'
 import MessageForm from './MessageForm'

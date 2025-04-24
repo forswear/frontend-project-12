@@ -1,4 +1,3 @@
-import React from 'react'
 import { ListGroup, Button } from 'react-bootstrap'
 import { useEffect, useRef } from 'react'
 import ModalNewChat from './ModalNewChat.jsx'

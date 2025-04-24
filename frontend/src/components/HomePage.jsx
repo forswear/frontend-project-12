@@ -1,4 +1,3 @@
-import React from 'react'
 import { Container, Row, Col } from 'react-bootstrap'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
