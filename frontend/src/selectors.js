@@ -1,4 +1,5 @@
-const selectMessagesByChannelId = (state, channelId) => state.messages.messages.filter(
-  (message) => message.channelId === channelId,
-);
-export default selectMessagesByChannelId;
+export const selectMessagesByChannelId = (state, channelId) => {
+  return state.messages.messages.filter(
+    (message) => message.channelId === channelId
+  )
+}
