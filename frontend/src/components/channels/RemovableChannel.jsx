@@ -29,16 +29,8 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
   }
 
   const saveEditedChannel = async (newName) => {
-    const channelId = channel.id
-    const authHeader = { headers: { Authorization: `Bearer ${localToken}` } }
-    const filteredName = leoProfanity.clean(newName)
-
     try {
-      await axios.put(
-        `${API_BASE_URL}channels/${channelId}`,
-        { name: filteredName },
-        authHeader
-      )
+      const filteredName = leoProfanity.clean(newName)
       dispatch({
         type: 'channels/renameChannel',
         payload: { id: channel.id, name: filteredName },
@@ -60,7 +52,6 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
         payload: { id: channel.id },
       })
       socket.emit('removeChannel', { channelId })
-      // Уведомление теперь только в RemoveChannelModal
     } catch (err) {
       console.error(err)
       toast.error(t('error_deleting_channel'))

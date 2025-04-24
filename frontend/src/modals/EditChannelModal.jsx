@@ -11,18 +11,22 @@ import leoProfanity from 'leo-profanity'
 const EditChannelModal = ({ show, onHide, channel, onSave }) => {
   const { t } = useTranslation()
   const [newName, setNewName] = useState(channel.name)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const token = useSelector((state) => state.auth.user.token)
 
   const handleSubmit = async () => {
+    setIsSubmitting(true)
     try {
       const validatedName = channelNameValidationSchema.validateSync(newName)
       const filteredName = leoProfanity.clean(validatedName)
       const authHeader = { headers: { Authorization: `Bearer ${token}` } }
+
       await axios.put(
         `${API_BASE_URL}channels/${channel.id}`,
         { name: filteredName },
         authHeader
       )
+
       onSave(filteredName)
       toast.success(t('channel_renamed'))
       onHide()
@@ -37,6 +41,8 @@ const EditChannelModal = ({ show, onHide, channel, onSave }) => {
       } else {
         toast.error(t('unknown_error'))
       }
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -53,16 +59,26 @@ const EditChannelModal = ({ show, onHide, channel, onSave }) => {
             className="mb-2 form-control"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
           />
           <label className="visually-hidden" htmlFor="name">
             {t('channel_name')}
           </label>
           <div className="d-flex justify-content-end">
-            <Button variant="secondary" className="me-2" onClick={onHide}>
+            <Button
+              variant="secondary"
+              className="me-2"
+              onClick={onHide}
+              disabled={isSubmitting}
+            >
               {t('cancel')}
             </Button>
-            <Button variant="primary" onClick={handleSubmit}>
-              {t('submit')}
+            <Button
+              variant="primary"
+              onClick={handleSubmit}
+              disabled={isSubmitting || !newName.trim()}
+            >
+              {isSubmitting ? t('submitting') : t('submit')}
             </Button>
           </div>
         </div>
