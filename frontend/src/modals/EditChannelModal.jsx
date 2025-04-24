@@ -1,47 +1,70 @@
-import { Modal, Button, Form } from 'react-bootstrap'
+import { Modal, Button } from 'react-bootstrap'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { channelNameValidationSchema } from '../utils/yupSchemas'
+import axios from 'axios'
+import { useSelector } from 'react-redux'
+import { API_BASE_URL } from '../api'
+import { toast } from 'react-toastify'
 
-const EditChannelModal = ({ show, onHide, onSave }) => {
+const EditChannelModal = ({ show, onHide, channel, onSave }) => {
   const { t } = useTranslation()
-  const [newName, setNewName] = useState('')
+  const [newName, setNewName] = useState(channel.name)
+  const token = useSelector((state) => state.auth.user.token)
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     try {
       const validatedName = channelNameValidationSchema.validateSync(newName)
+      const authHeader = { headers: { Authorization: `Bearer ${token}` } }
+      await axios.put(
+        `${API_BASE_URL}channels/${channel.id}`,
+        { name: validatedName },
+        authHeader
+      )
       onSave(validatedName)
+      toast.success(t('channel_renamed')) // Оставляем только это уведомление
       onHide()
-    } catch (validationError) {
-      alert(`Неверное имя канала: ${validationError.message}`)
+    } catch (error) {
+      console.error(error)
+      if (error.name === 'ValidationError') {
+        toast.error(error.message)
+      } else if (error.response) {
+        toast.error(t('error_renaming_channel'))
+      } else if (error.request) {
+        toast.error(t('network_error'))
+      } else {
+        toast.error(t('unknown_error'))
+      }
     }
   }
 
   return (
-    <Modal show={show} onHide={onHide}>
+    <Modal show={show} onHide={onHide} centered>
       <Modal.Header closeButton>
         <Modal.Title>{t('edit_channel')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form>
-          <Form.Group controlId="editChannelName">
-            <Form.Label>{t('Переименовать канал')}</Form.Label>
-            <Form.Control
-              type="text"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-            />
-          </Form.Group>
-        </Form>
+        <div>
+          <input
+            name="name"
+            id="name"
+            className="mb-2 form-control"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+          />
+          <label className="visually-hidden" htmlFor="name">
+            {t('channel_name')}
+          </label>
+          <div className="d-flex justify-content-end">
+            <Button variant="secondary" className="me-2" onClick={onHide}>
+              {t('cancel')}
+            </Button>
+            <Button variant="primary" onClick={handleSubmit}>
+              {t('submit')}
+            </Button>
+          </div>
+        </div>
       </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>
-          {t('cancel')}
-        </Button>
-        <Button variant="primary" onClick={handleSubmit}>
-          {t('Отправить')}
-        </Button>
-      </Modal.Footer>
     </Modal>
   )
 }

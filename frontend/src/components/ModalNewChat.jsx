@@ -1,4 +1,4 @@
-import { Modal, Form, Button } from 'react-bootstrap'
+import { Modal } from 'react-bootstrap'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
 import { useState, useEffect, useRef } from 'react'
@@ -8,6 +8,8 @@ import { useTranslation } from 'react-i18next'
 import leoProfanity from 'leo-profanity'
 import { closeModal } from '../slices/modalSlice'
 import { API_BASE_URL } from '../api'
+import { toast } from 'react-toastify'
+import { addNewChannel } from '../slices/channelsSlice'
 
 const ModalNewChat = () => {
   const { t } = useTranslation()
@@ -16,9 +18,10 @@ const ModalNewChat = () => {
   const { isModalOpen, modalType } = useSelector((state) => state.modal)
   const channels = useSelector((state) => state.channels.channels)
   const token = useSelector((state) => state.auth.user.token)
+  const inputRef = useRef(null)
 
   const validationSchema = yup.object({
-    newChannelName: yup
+    name: yup
       .string()
       .required(t('required_field'))
       .min(3, t('min_max_length', { min: 3, max: 20 }))
@@ -32,32 +35,35 @@ const ModalNewChat = () => {
   })
 
   const formik = useFormik({
-    initialValues: { newChannelName: '' },
+    initialValues: { name: '' },
     validationSchema,
     onSubmit: async (values) => {
       setDisabled(true)
-
-      const filteredName = leoProfanity.clean(values.newChannelName.trim())
-
+      const filteredName = leoProfanity.clean(values.name.trim())
       try {
-        await axios.post(
+        const response = await axios.post(
           `${API_BASE_URL}channels`,
           { name: filteredName },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         )
+        dispatch(addNewChannel(response.data))
+        toast.success(t('channel_created'))
+        formik.resetForm()
+        dispatch(closeModal())
       } catch (err) {
         console.error(err)
+        if (err.response) {
+          toast.error(t('error_creating_channel'))
+        } else if (err.request) {
+          toast.error(t('network_error'))
+        } else {
+          toast.error(t('unknown_error'))
+        }
       } finally {
-        formik.resetForm()
         setDisabled(false)
-        dispatch(closeModal())
       }
     },
   })
-
-  const inputRef = useRef(null)
 
   useEffect(() => {
     if (isModalOpen && modalType === 'addChannel') {
@@ -80,33 +86,41 @@ const ModalNewChat = () => {
         <Modal.Title>{t('add_channel')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form onSubmit={formik.handleSubmit}>
-          <Form.Group className="mb-3" controlId="newChannelName">
-            <Form.Control
+        <form onSubmit={formik.handleSubmit}>
+          <div>
+            <input
               ref={inputRef}
-              id="newChannelName"
-              type="text"
-              name="newChannelName"
-              placeholder={t('channel_name')}
+              name="name"
+              id="name"
+              className="mb-2 form-control"
+              value={formik.values.name}
               onChange={formik.handleChange}
-              value={formik.values.newChannelName}
-              isInvalid={
-                formik.touched.newChannelName && !!formik.errors.newChannelName
-              }
+              onBlur={formik.handleBlur}
             />
-            <Form.Control.Feedback type="invalid">
-              {formik.errors.newChannelName}
-            </Form.Control.Feedback>
-          </Form.Group>
-          <div className="d-flex justify-content-end gap-2">
-            <Button variant="secondary" onClick={handleClose}>
-              {t('cancel')}
-            </Button>
-            <Button variant="primary" type="submit" disabled={disabled}>
-              {t('submit')}
-            </Button>
+            <label className="visually-hidden" htmlFor="name">
+              {t('channel_name')}
+            </label>
+            {formik.touched.name && formik.errors.name && (
+              <div className="invalid-feedback">{formik.errors.name}</div>
+            )}
+            <div className="d-flex justify-content-end">
+              <button
+                type="button"
+                className="me-2 btn btn-secondary"
+                onClick={handleClose}
+              >
+                {t('cancel')}
+              </button>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={disabled}
+              >
+                {t('submit')}
+              </button>
+            </div>
           </div>
-        </Form>
+        </form>
       </Modal.Body>
     </Modal>
   )
