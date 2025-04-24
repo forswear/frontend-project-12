@@ -1,67 +1,71 @@
 // src/socket.js
-import io from 'socket.io-client'
+import io from 'socket.io-client';
+import Rollbar from 'rollbar';
 
-let socket = null
+const rollbar = new Rollbar('YOUR_ACCESS_TOKEN'); // Замените на ваш токен Rollbar
+
+let socket = null;
 
 export const initializeSocket = (token) => {
   if (!socket) {
-    const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001'
+    const serverUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
     socket = io(serverUrl, {
       auth: { token },
       autoConnect: true,
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
-    })
+    });
 
     socket.on('connect', () => {
-      console.log('WebSocket connected')
-    })
+      rollbar.info('WebSocket connected');
+    });
 
     socket.on('connect_error', (error) => {
-      console.error('WebSocket connection error:', error)
-    })
+      rollbar.error('WebSocket connection error:', error);
+    });
 
     socket.on('disconnect', () => {
-      console.log('WebSocket disconnected')
-    })
+      rollbar.info('WebSocket disconnected');
+    });
 
     socket.on('newChannel', (payload) => {
       const eventHandler = window.dispatchEvent(
         new CustomEvent('newChannel', { detail: payload })
-      )
+      );
       if (!eventHandler.defaultPrevented) {
-        console.warn("No handler for 'newChannel'")
+        rollbar.warning("No handler for 'newChannel'");
       }
-    })
+    });
 
     socket.on('newMessage', (payload) => {
       const eventHandler = window.dispatchEvent(
         new CustomEvent('newMessage', { detail: payload })
-      )
+      );
       if (!eventHandler.defaultPrevented) {
-        console.warn("No handler for 'newMessage'")
+        rollbar.warning("No handler for 'newMessage'");
       }
-    })
+    });
 
     socket.on('removeChannel', (payload) => {
       const eventHandler = window.dispatchEvent(
         new CustomEvent('removeChannel', { detail: payload })
-      )
+      );
       if (!eventHandler.defaultPrevented) {
-        console.warn("No handler for 'removeChannel'")
+        rollbar.warning("No handler for 'removeChannel'");
       }
-    })
+    });
+
     socket.on('renameChannel', (payload) => {
       const eventHandler = window.dispatchEvent(
         new CustomEvent('renameChannel', { detail: payload })
-      )
+      );
       if (!eventHandler.defaultPrevented) {
-        console.warn("No handler for 'renameChannel'")
+        rollbar.warning("No handler for 'renameChannel'");
       }
-    })
+    });
   }
-  return socket
-}
+  return socket;
+};
 
-export const getSocket = () => socket
+export const getSocket = () => socket;

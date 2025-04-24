@@ -1,5 +1,5 @@
-import i18n from 'i18next'
-import { initReactI18next } from 'react-i18next'
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
 
 const resources = {
   ru: {
@@ -58,7 +58,7 @@ const resources = {
       remove: 'Удалить',
     },
   },
-}
+};
 
 export const initI18n = () => {
   return i18n.use(initReactI18next).init({
@@ -68,7 +68,7 @@ export const initI18n = () => {
     interpolation: {
       escapeValue: false,
     },
-  })
-}
+  });
+};
 
-export const i18nInstance = i18n
+export const i18nInstance = i18n;
