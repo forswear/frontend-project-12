@@ -12,11 +12,11 @@ const MessageForm = ({ activeChannel }) => {
   const username = useSelector((state) => state.auth.user.username)
 
   const formik = useFormik({
-    initialValues: { message: '' },
+    initialValues: { body: '' },
     onSubmit: async (values, { resetForm }) => {
-      if (!values.message.trim() || !activeChannel?.id) return
+      if (!values.body.trim() || !activeChannel?.id) return
 
-      const filteredMessage = leoProfanity.clean(values.message.trim())
+      const filteredMessage = leoProfanity.clean(values.body.trim())
       try {
         const messageData = {
           body: filteredMessage,
@@ -32,33 +32,25 @@ const MessageForm = ({ activeChannel }) => {
     },
   })
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      formik.handleSubmit()
-    }
-  }
-
   return (
     <Form onSubmit={formik.handleSubmit} className="d-flex align-items-center">
       <Form.Group className="flex-grow-1 me-2">
         <Form.Control
-          as="textarea"
-          rows={1}
+          as="input"
+          type="text"
+          name="body"
+          aria-label="Новое сообщение"
           placeholder={t('message_placeholder')}
-          style={{ resize: 'none' }}
-          id="message"
-          name="message"
-          value={formik.values.message}
+          className="border-0 p-0 ps-2"
+          value={formik.values.body}
           onChange={formik.handleChange}
-          onKeyDown={handleKeyDown}
           required
         />
       </Form.Group>
       <Button
         variant="primary"
         type="submit"
-        disabled={!formik.values.message.trim()}
+        disabled={!formik.values.body.trim()}
         style={{ height: '38px' }}
       >
         {t('send')}
