@@ -1,4 +1,3 @@
-import React from 'react'
 import { Button, Dropdown } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
