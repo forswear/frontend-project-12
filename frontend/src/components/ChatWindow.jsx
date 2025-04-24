@@ -17,11 +17,12 @@ const ChatWindow = ({ activeChannel }) => {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [filteredMessages])
+  }, [filteredMessages, activeChannel?.id]) // Добавили activeChannel?.id в зависимости
 
   useEffect(() => {
+    let socket
     if (token) {
-      const socket = initializeSocket(token)
+      socket = initializeSocket(token)
       const handleNewMessage = (payload) => {
         if (
           payload?.body &&
@@ -32,11 +33,13 @@ const ChatWindow = ({ activeChannel }) => {
         }
       }
       socket.on('newMessage', handleNewMessage)
-      return () => {
-        socket.off('newMessage', handleNewMessage)
+    }
+    return () => {
+      if (socket) {
+        socket.off('newMessage')
       }
     }
-  }, [dispatch, token, activeChannel?.id])
+  }, [dispatch, token, activeChannel?.id]) // Добавили активный канал в зависимости
 
   if (!activeChannel) {
     return <div className="p-3">{t('select_channel')}</div>
@@ -44,15 +47,12 @@ const ChatWindow = ({ activeChannel }) => {
 
   return (
     <div className="d-flex flex-column h-100">
-      {/* Заголовок чата */}
       <div className="bg-light mb-4 p-3 shadow-sm small">
         <p className="m-0">
           <b>#{activeChannel.name}</b>
         </p>
         <span className="text-muted">{`${filteredMessages.length} сообщений`}</span>
       </div>
-
-      {/* Основной контейнер с сообщениями */}
       <div className="flex-grow-1 position-relative">
         <div
           id="messages-box"
@@ -66,9 +66,7 @@ const ChatWindow = ({ activeChannel }) => {
           ))}
           <div ref={messagesEndRef} />
         </div>
-      </div>
-
-      {/* Форма ввода сообщений */}
+      </div>{' '}
       <MessageForm activeChannel={activeChannel} />
     </div>
   )
