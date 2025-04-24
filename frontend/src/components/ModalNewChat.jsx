@@ -10,14 +10,16 @@ import { closeModal } from '../slices/modalSlice'
 import { API_BASE_URL } from '../api'
 import { toast } from 'react-toastify'
 import { addNewChannel } from '../slices/channelsSlice'
+import { initializeSocket } from '../socket'
 
-const ModalNewChat = () => {
+const ModalNewChat = ({ setActiveChannel }) => {
   const { t } = useTranslation()
   const [disabled, setDisabled] = useState(false)
   const dispatch = useDispatch()
   const { isModalOpen, modalType } = useSelector((state) => state.modal)
   const channels = useSelector((state) => state.channels.channels)
   const token = useSelector((state) => state.auth.user.token)
+  const socket = initializeSocket()
   const inputRef = useRef(null)
 
   const validationSchema = yup.object({
@@ -46,7 +48,16 @@ const ModalNewChat = () => {
           { name: filteredName },
           { headers: { Authorization: `Bearer ${token}` } }
         )
-        dispatch(addNewChannel({ ...response.data, name: filteredName }))
+
+        const newChannel = { ...response.data, name: filteredName }
+        dispatch(addNewChannel(newChannel))
+
+        // Отправляем событие через сокет для синхронизации с другими клиентами
+        socket.emit('newChannel', newChannel)
+
+        // Устанавливаем новый канал как активный
+        setActiveChannel(newChannel)
+
         toast.success(t('channel_created'))
         formik.resetForm()
         dispatch(closeModal())

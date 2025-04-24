@@ -68,7 +68,7 @@ const ChannelList = ({ channels, activeChannel, onChannelClick }) => {
       ) : (
         <p>{t('no_channels')}</p>
       )}
-      <ModalNewChat showModal={isModalOpen} />
+      <ModalNewChat showModal={isModalOpen} setActiveChannel={onChannelClick} />
     </>
   )
 }

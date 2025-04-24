@@ -52,6 +52,14 @@ export const initializeSocket = (token) => {
         console.warn("No handler for 'removeChannel'")
       }
     })
+    socket.on('renameChannel', (payload) => {
+      const eventHandler = window.dispatchEvent(
+        new CustomEvent('renameChannel', { detail: payload })
+      )
+      if (!eventHandler.defaultPrevented) {
+        console.warn("No handler for 'renameChannel'")
+      }
+    })
   }
   return socket
 }

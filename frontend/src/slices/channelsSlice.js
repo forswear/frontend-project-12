@@ -19,7 +19,9 @@ const channelsSlice = createSlice({
     },
     renameChannel: (state, { payload }) => {
       const channel = state.channels.find((c) => c.id === payload.id)
-      if (channel) channel.name = payload.name
+      if (channel) {
+        channel.name = payload.name
+      }
     },
   },
 })

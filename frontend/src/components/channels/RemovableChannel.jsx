@@ -30,17 +30,26 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
   const saveEditedChannel = async (newName) => {
     try {
       const filteredName = leoProfanity.clean(newName)
-      dispatch({
-        type: 'channels/renameChannel',
-        payload: { id: channel.id, name: filteredName },
-      })
-
       const authHeader = { headers: { Authorization: `Bearer ${localToken}` } }
+
+      // Сначала обновляем на сервере
       await axios.put(
         `${API_BASE_URL}channels/${channel.id}`,
         { name: filteredName },
         authHeader
       )
+
+      // Затем обновляем в хранилище
+      dispatch({
+        type: 'channels/renameChannel',
+        payload: { id: channel.id, name: filteredName },
+      })
+
+      // Отправляем событие через сокет для синхронизации с другими клиентами
+      socket.emit('renameChannel', {
+        channelId: channel.id,
+        name: filteredName,
+      })
 
       toast.success(t('channel_renamed'))
       setShowEditModal(false)
@@ -90,7 +99,7 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
               isActive ? 'text-white' : ''
             }`}
           >
-            <span className="visually-hidden">{'Управление каналом'}</span>
+            <span className="visually-hidden">{t('channel_management')}</span>
           </Dropdown.Toggle>
           <Dropdown.Menu>
             <Dropdown.Item onClick={handleDeleteChannel}>
