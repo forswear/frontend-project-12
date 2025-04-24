@@ -43,7 +43,7 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
       )
 
       toast.success(t('channel_renamed'))
-      setShowEditModal(false) // Закрываем модальное окно
+      setShowEditModal(false)
     } catch (err) {
       console.error(err)
       toast.error(t('error_renaming_channel'))
@@ -89,7 +89,9 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
             className={`rounded-0 border-start-0 ${
               isActive ? 'text-white' : ''
             }`}
-          />
+          >
+            <span className="visually-hidden">{'Управление каналом'}</span>
+          </Dropdown.Toggle>
           <Dropdown.Menu>
             <Dropdown.Item onClick={handleDeleteChannel}>
               {t('delete_channel')}

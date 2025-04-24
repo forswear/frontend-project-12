@@ -26,7 +26,6 @@ const EditChannelModal = ({ show, onHide, channel, onSave }) => {
         authHeader
       )
       onSave(filteredName)
-      toast.success(t('channel_renamed'))
       onHide()
     } catch (error) {
       console.error(error)
