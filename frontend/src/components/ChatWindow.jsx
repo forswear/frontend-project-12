@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import MessageForm from './MessageForm'
 import { selectMessagesByChannelId } from '../selectors'
 import { initializeSocket } from '../socket'
@@ -11,13 +11,21 @@ const ChatWindow = ({ activeChannel }) => {
   const dispatch = useDispatch()
   const token = useSelector((state) => state.auth.user.token)
   const messagesEndRef = useRef(null)
+  const [currentChannelId, setCurrentChannelId] = useState(null)
   const filteredMessages = useSelector((state) =>
     selectMessagesByChannelId(state, activeChannel?.id)
   )
 
   useEffect(() => {
+    if (activeChannel?.id !== currentChannelId) {
+      setCurrentChannelId(activeChannel?.id)
+      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' })
+    }
+  }, [activeChannel?.id, currentChannelId])
+
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [filteredMessages, activeChannel?.id]) // Добавили activeChannel?.id в зависимости
+  }, [filteredMessages])
 
   useEffect(() => {
     let socket
@@ -39,7 +47,7 @@ const ChatWindow = ({ activeChannel }) => {
         socket.off('newMessage')
       }
     }
-  }, [dispatch, token, activeChannel?.id]) // Добавили активный канал в зависимости
+  }, [dispatch, token, activeChannel?.id])
 
   if (!activeChannel) {
     return <div className="p-3">{t('select_channel')}</div>
@@ -53,21 +61,20 @@ const ChatWindow = ({ activeChannel }) => {
         </p>
         <span className="text-muted">{`${filteredMessages.length} сообщений`}</span>
       </div>
-      <div className="flex-grow-1 position-relative">
-        <div
-          id="messages-box"
-          className="chat-messages overflow-auto px-5 position-absolute w-100 h-100"
-          style={{ top: 0, bottom: 0 }}
-        >
-          {filteredMessages.map((message) => (
-            <div key={message.id} className="mb-2">
-              <strong>{message.username}:</strong> {message.body}
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-      </div>{' '}
-      <MessageForm activeChannel={activeChannel} />
+      <div
+        className="chat-messages overflow-auto px-5 flex-grow-1"
+        style={{ maxHeight: 'calc(100vh - 200px)' }}
+      >
+        {filteredMessages.map((message) => (
+          <div key={message.id} className="mb-2">
+            <strong>{message.username}:</strong> {message.body}
+          </div>
+        ))}
+        <div ref={messagesEndRef} />
+      </div>
+      <div className="mt-auto p-3 border-top">
+        <MessageForm activeChannel={activeChannel} />
+      </div>
     </div>
   )
 }

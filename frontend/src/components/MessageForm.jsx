@@ -23,7 +23,6 @@ const MessageForm = ({ activeChannel }) => {
           channelId: activeChannel.id,
           username,
         }
-
         const authHeader = { headers: { Authorization: `Bearer ${token}` } }
         await axios.post(`${API_BASE_URL}messages`, messageData, authHeader)
         resetForm()
@@ -33,30 +32,37 @@ const MessageForm = ({ activeChannel }) => {
     },
   })
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      formik.handleSubmit()
+    }
+  }
+
   return (
-    <Form className="p-3 border-top" onSubmit={formik.handleSubmit}>
-      <Form.Group className="d-flex">
+    <Form onSubmit={formik.handleSubmit} className="d-flex align-items-center">
+      <Form.Group className="flex-grow-1 me-2">
         <Form.Control
           as="textarea"
-          rows={2}
+          rows={1}
           placeholder={t('message_placeholder')}
-          style={{ resize: 'none', flexGrow: 1 }}
+          style={{ resize: 'none' }}
           id="message"
           name="message"
           value={formik.values.message}
           onChange={formik.handleChange}
+          onKeyDown={handleKeyDown}
           required
-          aria-label="Новое сообщение"
         />
-        <Button
-          variant="primary"
-          className="ms-2"
-          type="submit"
-          disabled={!formik.values.message.trim()}
-        >
-          {t('send')}
-        </Button>
       </Form.Group>
+      <Button
+        variant="primary"
+        type="submit"
+        disabled={!formik.values.message.trim()}
+        style={{ height: '38px' }}
+      >
+        {t('send')}
+      </Button>
     </Form>
   )
 }
