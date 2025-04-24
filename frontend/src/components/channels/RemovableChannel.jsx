@@ -1,13 +1,14 @@
 import { Button, Dropdown } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
-import { toast } from 'react-toastify'
 import { useTranslation } from 'react-i18next'
 import { initializeSocket } from '../../socket'
 import { API_BASE_URL } from '../../api'
 import EditChannelModal from '../../modals/EditChannelModal'
 import RemoveChannelModal from '../../modals/RemoveChannelModal'
 import React, { useState } from 'react'
+import leoProfanity from 'leo-profanity'
+import { toast } from 'react-toastify'
 
 const RemovableChannel = ({ channel, isActive, onClick }) => {
   const { t } = useTranslation()
@@ -17,6 +18,8 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
   const [showEditModal, setShowEditModal] = useState(false)
   const [showRemoveModal, setShowRemoveModal] = useState(false)
 
+  const displayName = leoProfanity.clean(channel.name)
+
   const handleRenameChannel = () => {
     setShowEditModal(true)
   }
@@ -25,43 +28,43 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
     setShowRemoveModal(true)
   }
 
-  const saveEditedChannel = (newName) => {
+  const saveEditedChannel = async (newName) => {
     const channelId = channel.id
     const authHeader = { headers: { Authorization: `Bearer ${localToken}` } }
-    axios
-      .put(
+    const filteredName = leoProfanity.clean(newName)
+
+    try {
+      await axios.put(
         `${API_BASE_URL}channels/${channelId}`,
-        { name: newName },
+        { name: filteredName },
         authHeader
       )
-      .then(() => {
-        dispatch({
-          type: 'channels/renameChannel',
-          payload: { id: channel.id, name: newName },
-        })
+      dispatch({
+        type: 'channels/renameChannel',
+        payload: { id: channel.id, name: filteredName },
       })
-      .catch((err) => {
-        console.error(err)
-        toast.error(t('error_renaming_channel'))
-      })
+    } catch (err) {
+      console.error(err)
+      toast.error(t('error_renaming_channel'))
+    }
   }
 
-  const confirmRemoveChannel = () => {
+  const confirmRemoveChannel = async () => {
     const channelId = channel.id
     const authHeader = { headers: { Authorization: `Bearer ${localToken}` } }
-    axios
-      .delete(`${API_BASE_URL}channels/${channelId}`, authHeader)
-      .then(() => {
-        dispatch({
-          type: 'channels/removeChannel',
-          payload: { id: channel.id },
-        })
-        socket.emit('removeChannel', { channelId })
+
+    try {
+      await axios.delete(`${API_BASE_URL}channels/${channelId}`, authHeader)
+      dispatch({
+        type: 'channels/removeChannel',
+        payload: { id: channel.id },
       })
-      .catch((err) => {
-        console.error(err)
-        toast.error(t('error_deleting_channel'))
-      })
+      socket.emit('removeChannel', { channelId })
+      // Уведомление теперь только в RemoveChannelModal
+    } catch (err) {
+      console.error(err)
+      toast.error(t('error_deleting_channel'))
+    }
   }
 
   return (
@@ -79,7 +82,7 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
             whiteSpace: 'nowrap',
           }}
         >
-          #{channel.name}
+          #{displayName}
         </Button>
         <Dropdown align="end" drop="down" className="rounded-0">
           <Dropdown.Toggle
@@ -101,13 +104,14 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
       <EditChannelModal
         show={showEditModal}
         onHide={() => setShowEditModal(false)}
-        channel={channel}
+        channel={{ ...channel, name: displayName }}
         onSave={saveEditedChannel}
       />
       <RemoveChannelModal
         show={showRemoveModal}
         onHide={() => setShowRemoveModal(false)}
         onConfirm={confirmRemoveChannel}
+        channelId={channel.id}
       />
     </>
   )

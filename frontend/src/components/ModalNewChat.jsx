@@ -27,10 +27,10 @@ const ModalNewChat = () => {
       .min(3, t('min_max_length', { min: 3, max: 20 }))
       .max(20, t('min_max_length', { min: 3, max: 20 }))
       .test('unique-channel', t('required_field'), (value) => {
-        return !channels.some((channel) => channel.name === value.trim())
-      })
-      .test('profanity-check', t('profanity_not_allowed'), (value) => {
-        return !leoProfanity.check(value.trim())
+        const cleanValue = leoProfanity.clean(value.trim())
+        return !channels.some(
+          (channel) => leoProfanity.clean(channel.name) === cleanValue
+        )
       }),
   })
 
@@ -46,7 +46,7 @@ const ModalNewChat = () => {
           { name: filteredName },
           { headers: { Authorization: `Bearer ${token}` } }
         )
-        dispatch(addNewChannel(response.data))
+        dispatch(addNewChannel({ ...response.data, name: filteredName }))
         toast.success(t('channel_created'))
         formik.resetForm()
         dispatch(closeModal())

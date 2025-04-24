@@ -6,6 +6,7 @@ import axios from 'axios'
 import { useSelector } from 'react-redux'
 import { API_BASE_URL } from '../api'
 import { toast } from 'react-toastify'
+import leoProfanity from 'leo-profanity'
 
 const EditChannelModal = ({ show, onHide, channel, onSave }) => {
   const { t } = useTranslation()
@@ -15,14 +16,15 @@ const EditChannelModal = ({ show, onHide, channel, onSave }) => {
   const handleSubmit = async () => {
     try {
       const validatedName = channelNameValidationSchema.validateSync(newName)
+      const filteredName = leoProfanity.clean(validatedName)
       const authHeader = { headers: { Authorization: `Bearer ${token}` } }
       await axios.put(
         `${API_BASE_URL}channels/${channel.id}`,
-        { name: validatedName },
+        { name: filteredName },
         authHeader
       )
-      onSave(validatedName)
-      toast.success(t('channel_renamed')) // Оставляем только это уведомление
+      onSave(filteredName)
+      toast.success(t('channel_renamed'))
       onHide()
     } catch (error) {
       console.error(error)
