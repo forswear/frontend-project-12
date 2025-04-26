@@ -1,18 +1,18 @@
 import React from 'react'
 import { ListGroup, Button } from 'react-bootstrap'
 import { useEffect, useRef } from 'react'
-import ModalNewChat from './ModalNewChat.jsx'
 import RemovableChannel from './channels/RemovableChannel.jsx'
 import UnremovableChannel from './channels/UnremovableChannel.jsx'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { openModal } from '../slices/modalSlice'
+import AddChannelModal from '../modals/AddChannelModal'
 
 const ChannelList = ({ channels, activeChannel, onChannelClick }) => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
   const activeChannelRef = useRef(null)
-  const { isModalOpen } = useSelector((state) => state.modal)
+  const { isModalOpen, modalType } = useSelector((state) => state.modal)
 
   useEffect(() => {
     if (activeChannelRef.current) {
@@ -69,7 +69,12 @@ const ChannelList = ({ channels, activeChannel, onChannelClick }) => {
       ) : (
         <p>{t('no_channels')}</p>
       )}
-      <ModalNewChat showModal={isModalOpen} setActiveChannel={onChannelClick} />
+      {modalType === 'addChannel' && (
+        <AddChannelModal
+          showModal={isModalOpen}
+          setActiveChannel={onChannelClick}
+        />
+      )}
     </>
   )
 }

@@ -1,8 +1,7 @@
 import React from 'react'
-import { Modal } from 'react-bootstrap'
+import { Modal, Button } from 'react-bootstrap'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
-import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
@@ -13,15 +12,15 @@ import { toast } from 'react-toastify'
 import { addNewChannel } from '../slices/channelsSlice'
 import { getSocket } from '../socket'
 
-const ModalNewChat = ({ setActiveChannel }) => {
+const AddChannelModal = ({ setActiveChannel }) => {
   const { t } = useTranslation()
-  const [disabled, setDisabled] = useState(false)
+  const [disabled, setDisabled] = React.useState(false)
   const dispatch = useDispatch()
-  const { isModalOpen, modalType } = useSelector((state) => state.modal)
+  const { isModalOpen } = useSelector((state) => state.modal)
   const channels = useSelector((state) => state.channels.channels)
   const token = useSelector((state) => state.auth.user.token)
   const socket = getSocket()
-  const inputRef = useRef(null)
+  const inputRef = React.useRef(null)
 
   const validationSchema = yup.object({
     name: yup
@@ -75,19 +74,15 @@ const ModalNewChat = ({ setActiveChannel }) => {
     },
   })
 
-  useEffect(() => {
-    if (isModalOpen && modalType === 'addChannel') {
+  React.useEffect(() => {
+    if (isModalOpen) {
       inputRef.current?.focus()
     }
-  }, [isModalOpen, modalType])
+  }, [isModalOpen])
 
   const handleClose = () => {
     formik.resetForm()
     dispatch(closeModal())
-  }
-
-  if (modalType !== 'addChannel') {
-    return null
   }
 
   return (
@@ -136,4 +131,4 @@ const ModalNewChat = ({ setActiveChannel }) => {
   )
 }
 
-export default ModalNewChat
+export default AddChannelModal
