@@ -96,7 +96,7 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
               isActive ? 'text-white' : ''
             }`}
           >
-            <span className="visually-hidden">{t('channel_management')}</span>
+            <span className="visually-hidden">{'Управление каналом'}</span>
           </Dropdown.Toggle>
           <Dropdown.Menu>
             <Dropdown.Item onClick={handleDeleteChannel}>
