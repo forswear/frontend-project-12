@@ -25,32 +25,39 @@ const initializeApp = async () => {
     leoProfanity.add(leoProfanity.getDictionary('ru'))
 
     window.Rollbar = rollbar
-
-    const rootElement = document.getElementById('root')
-    const root = createRoot(rootElement)
-
-    root.render(
-      <StrictMode>
-        <Provider store={store}>
-          <App />
-          <ToastContainer
-            position="top-right"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
-        </Provider>
-      </StrictMode>
-    )
   } catch (error) {
     rollbar.error('Failed to initialize app', error)
     console.error('Application initialization failed:', error)
   }
 }
 
+const renderApp = () => {
+  const rootElement = document.getElementById('root')
+  const root = createRoot(rootElement)
+
+  root.render(
+    <StrictMode>
+      <Provider store={store}>
+        <App />
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+      </Provider>
+    </StrictMode>
+  )
+}
+
 initializeApp()
+  .then(renderApp)
+  .catch((error) => {
+    rollbar.error('Failed to render app', error)
+    console.error('Application rendering failed:', error)
+  })
