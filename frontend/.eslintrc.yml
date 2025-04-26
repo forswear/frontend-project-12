@@ -18,6 +18,13 @@ settings:
     node:
       extensions: ['.js', '.jsx']
 rules:
+react/function-component-definition: [
+    'error',
+    {
+      namedComponents: ['function-declaration', 'arrow-function'],
+      unnamedComponents: 'arrow-function',
+    }
+]
   linebreak-style: ['error', 'unix']
   semi: ['error', 'always']
   'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }]
