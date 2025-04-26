@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 const ChatWindow = ({ activeChannel }) => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
-  const token = useSelector((state) => state.auth.user.token)
+
   const messagesEndRef = useRef(null)
   const [currentChannelId, setCurrentChannelId] = useState(null)
   const filteredMessages = useSelector((state) =>
