@@ -2,7 +2,6 @@ import { Button, Dropdown } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import { useTranslation } from 'react-i18next'
-import { getSocket } from '../../socket'
 import { API_BASE_URL } from '../../api'
 import EditChannelModal from '../../modals/EditChannelModal'
 import RemoveChannelModal from '../../modals/RemoveChannelModal'
@@ -14,7 +13,6 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
   const localToken = useSelector((state) => state.auth.user.token)
-  const socket = getSocket()
   const [showEditModal, setShowEditModal] = useState(false)
   const [showRemoveModal, setShowRemoveModal] = useState(false)
   const displayName = leoProfanity.clean(channel.name)
