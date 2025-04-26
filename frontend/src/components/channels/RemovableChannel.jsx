@@ -43,11 +43,6 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
         payload: { id: channel.id, name: filteredName },
       })
 
-      socket?.emit('renameChannel', {
-        channelId: channel.id,
-        name: filteredName,
-      })
-
       toast.success(t('channel_renamed'))
       setShowEditModal(false)
     } catch (err) {
@@ -65,7 +60,6 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
         type: 'channels/removeChannel',
         payload: { id: channel.id },
       })
-      socket?.emit('removeChannel', { channelId })
     } catch (err) {
       console.error(err)
       toast.error(t('error_deleting_channel'))

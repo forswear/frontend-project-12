@@ -1,5 +1,5 @@
 import React from 'react'
-import { Modal, Button } from 'react-bootstrap'
+import { Modal } from 'react-bootstrap'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
 import axios from 'axios'
@@ -10,7 +10,6 @@ import { closeModal } from '../slices/modalSlice'
 import { API_BASE_URL } from '../api'
 import { toast } from 'react-toastify'
 import { addNewChannel } from '../slices/channelsSlice'
-import { getSocket } from '../socket'
 
 const AddChannelModal = ({ setActiveChannel }) => {
   const { t } = useTranslation()
@@ -19,7 +18,6 @@ const AddChannelModal = ({ setActiveChannel }) => {
   const { isModalOpen } = useSelector((state) => state.modal)
   const channels = useSelector((state) => state.channels.channels)
   const token = useSelector((state) => state.auth.user.token)
-  const socket = getSocket()
   const inputRef = React.useRef(null)
 
   const validationSchema = yup.object({
@@ -51,8 +49,6 @@ const AddChannelModal = ({ setActiveChannel }) => {
 
         const newChannel = { ...response.data, name: filteredName }
         dispatch(addNewChannel(newChannel))
-
-        socket?.emit('newChannel', newChannel)
 
         setActiveChannel(newChannel)
 

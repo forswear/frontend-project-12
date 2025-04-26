@@ -4,7 +4,7 @@ import { toast } from 'react-toastify'
 import i18n from 'i18next'
 
 const rollbar = new Rollbar({
-  accessToken: 'db2977d78de306f3d8d17b9137c1f4bf',
+  accessToken: import.meta.env.VITE_ROLLBAR_TOKEN,
   captureUncaught: true,
   captureUnhandledRejections: true,
 })
