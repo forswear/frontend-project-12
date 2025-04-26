@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { userLogOut } from '../slices/authSlice.js'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { disconnectSocket } from '../socket'
 
 const Header = () => {
   const { t } = useTranslation()
@@ -14,6 +15,7 @@ const Header = () => {
 
   const handleLogout = () => {
     dispatch(userLogOut())
+    disconnectSocket()
     navigate('/login', { replace: true })
   }
 
@@ -21,7 +23,7 @@ const Header = () => {
     <Navbar bg="light" variant="light" className="border-bottom p-2">
       <Container>
         <Navbar.Brand as={Link} to="/">
-          {t('hexlet_chat')} {}
+          {t('hexlet_chat')}
         </Navbar.Brand>
         {isAuthenticated ? (
           <Button
@@ -29,7 +31,7 @@ const Header = () => {
             onClick={handleLogout}
             className="float-end"
           >
-            {t('logout')} {/* Перевод текста кнопки выхода */}
+            {t('logout')}
           </Button>
         ) : null}
       </Container>

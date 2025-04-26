@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useEffect, useRef, useState } from 'react'
 import MessageForm from './MessageForm'
 import { selectMessagesByChannelId } from '../selectors'
-import { initializeSocket } from '../socket'
+import { getSocket } from '../socket'
 import { addNewMessage } from '../slices/messagesSlice'
 import { useTranslation } from 'react-i18next'
 
@@ -16,6 +16,7 @@ const ChatWindow = ({ activeChannel }) => {
   const filteredMessages = useSelector((state) =>
     selectMessagesByChannelId(state, activeChannel?.id)
   )
+  const socket = getSocket()
 
   useEffect(() => {
     if (activeChannel?.id !== currentChannelId) {
@@ -29,26 +30,24 @@ const ChatWindow = ({ activeChannel }) => {
   }, [filteredMessages])
 
   useEffect(() => {
-    let socket
-    if (token) {
-      socket = initializeSocket(token)
-      const handleNewMessage = (payload) => {
-        if (
-          payload?.body &&
-          payload?.channelId === activeChannel?.id &&
-          payload?.username
-        ) {
-          dispatch(addNewMessage(payload))
-        }
+    if (!socket) return
+
+    const handleNewMessage = (payload) => {
+      if (
+        payload?.body &&
+        payload?.channelId === activeChannel?.id &&
+        payload?.username
+      ) {
+        dispatch(addNewMessage(payload))
       }
-      socket.on('newMessage', handleNewMessage)
     }
+
+    socket.on('newMessage', handleNewMessage)
+
     return () => {
-      if (socket) {
-        socket.off('newMessage')
-      }
+      socket.off('newMessage', handleNewMessage)
     }
-  }, [dispatch, token, activeChannel?.id])
+  }, [dispatch, activeChannel?.id, socket])
 
   if (!activeChannel) {
     return <div className="p-3">{t('select_channel')}</div>
@@ -60,7 +59,9 @@ const ChatWindow = ({ activeChannel }) => {
         <p className="m-0">
           <b>#{activeChannel.name}</b>
         </p>
-        <span className="text-muted">{`${filteredMessages.length} сообщений`}</span>
+        <span className="text-muted">{`${filteredMessages.length} ${t(
+          'messages'
+        )}`}</span>
       </div>
       <div
         id={`chat-${activeChannel.id}`}

@@ -2,7 +2,7 @@ import { Button, Dropdown } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import { useTranslation } from 'react-i18next'
-import { initializeSocket } from '../../socket'
+import { getSocket } from '../../socket'
 import { API_BASE_URL } from '../../api'
 import EditChannelModal from '../../modals/EditChannelModal'
 import RemoveChannelModal from '../../modals/RemoveChannelModal'
@@ -14,7 +14,7 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
   const localToken = useSelector((state) => state.auth.user.token)
-  const socket = initializeSocket()
+  const socket = getSocket()
   const [showEditModal, setShowEditModal] = useState(false)
   const [showRemoveModal, setShowRemoveModal] = useState(false)
   const displayName = leoProfanity.clean(channel.name)
@@ -43,7 +43,7 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
         payload: { id: channel.id, name: filteredName },
       })
 
-      socket.emit('renameChannel', {
+      socket?.emit('renameChannel', {
         channelId: channel.id,
         name: filteredName,
       })
@@ -65,7 +65,7 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
         type: 'channels/removeChannel',
         payload: { id: channel.id },
       })
-      socket.emit('removeChannel', { channelId })
+      socket?.emit('removeChannel', { channelId })
     } catch (err) {
       console.error(err)
       toast.error(t('error_deleting_channel'))
@@ -96,7 +96,7 @@ const RemovableChannel = ({ channel, isActive, onClick }) => {
               isActive ? 'text-white' : ''
             }`}
           >
-            <span className="visually-hidden">{'Управление каналом'}</span>
+            <span className="visually-hidden">{t('channel_management')}</span>
           </Dropdown.Toggle>
           <Dropdown.Menu>
             <Dropdown.Item onClick={handleDeleteChannel}>

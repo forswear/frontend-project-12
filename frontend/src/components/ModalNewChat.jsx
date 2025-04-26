@@ -11,7 +11,7 @@ import { closeModal } from '../slices/modalSlice'
 import { API_BASE_URL } from '../api'
 import { toast } from 'react-toastify'
 import { addNewChannel } from '../slices/channelsSlice'
-import { initializeSocket } from '../socket'
+import { getSocket } from '../socket'
 
 const ModalNewChat = ({ setActiveChannel }) => {
   const { t } = useTranslation()
@@ -20,7 +20,7 @@ const ModalNewChat = ({ setActiveChannel }) => {
   const { isModalOpen, modalType } = useSelector((state) => state.modal)
   const channels = useSelector((state) => state.channels.channels)
   const token = useSelector((state) => state.auth.user.token)
-  const socket = initializeSocket()
+  const socket = getSocket()
   const inputRef = useRef(null)
 
   const validationSchema = yup.object({
@@ -53,7 +53,7 @@ const ModalNewChat = ({ setActiveChannel }) => {
         const newChannel = { ...response.data, name: filteredName }
         dispatch(addNewChannel(newChannel))
 
-        socket.emit('newChannel', newChannel)
+        socket?.emit('newChannel', newChannel)
 
         setActiveChannel(newChannel)
 
